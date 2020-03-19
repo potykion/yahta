@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Flutter Demo',
       theme: new ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
       home: new MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -29,17 +29,28 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var previousIndex = 0;
+  var currentDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       body: new Swiper(
-        itemBuilder: (BuildContext context, int index) =>
-            Center(child: Text(index.toString())),
+        itemBuilder: (BuildContext context, int index) => Center(
+          child: Text(
+            currentDate.toString(),
+          ),
+        ),
         onIndexChanged: (int newIndex) {
-          var direction = Direction(previousIndex, newIndex);
-          print(direction.type == Direction.RIGHT ? "swipe right" : "swipe left");
-          setState(() => previousIndex = newIndex);
+          setState(() {
+            currentDate = DateTimeSwipe(
+              currentDate,
+              SwipeDirection(previousIndex, newIndex),
+            ).swipedDatetime;
+
+            previousIndex = newIndex;
+          });
+
+          print(currentDate);
         },
         itemCount: 3,
         control: new SwiperControl(),

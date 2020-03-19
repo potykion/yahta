@@ -23,6 +23,15 @@ dependencies:
   # свайпы
   flutter_swiper: ^1.1.6
 
+  # форматирование даты
+  intl: ^0.16.1
+
+  # абстракция над склайт
+  moor: 2.4.2
+  moor_ffi: 0.4.0
+  path_provider:
+  path:
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
@@ -30,6 +39,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  # кодогенерация для склайт абстракций
+  moor_generator: 2.4.0
+  build_runner:
+
 
 
 # For information on the generic Dart part of this file, see the
