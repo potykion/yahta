@@ -40,4 +40,9 @@ class Database extends _$Database {
 
   @override
   int get schemaVersion => 1;
+
+  Future<int> insertHabit(HabitsCompanion habitsCompanion) =>
+      into(habits).insert(habitsCompanion);
+
+  Future<List<Habit>> listHabits() => select(habits).get();
 }
