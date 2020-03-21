@@ -4,6 +4,7 @@ import 'package:moor/moor.dart';
 import 'package:moor_ffi/moor_ffi.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:yahta/direction.dart';
 
 part 'habit.g.dart';
 
@@ -48,4 +49,21 @@ class Database extends _$Database {
 
   Stream<List<Habit>> listHabitsStream() => select(habits).watch();
 
+  Future<int> insertHabitMark(HabitMarksCompanion habitMarksCompanion) =>
+      into(habitMarks).insert(habitMarksCompanion);
+
+  Future<HabitMark> getHabitMarkById(int habitMarkId) =>
+      (select(habitMarks)..where((mark) => mark.habitId.equals(habitMarkId)))
+          .getSingle();
+
+  Future<List<HabitMark>> listHabitMarksForDate(
+          DayDateTimeRange dayDateTimeRange) =>
+      (select(habitMarks)
+            ..where(
+              (mark) => mark.datetime.isBetweenValues(
+                dayDateTimeRange.fromDateTime,
+                dayDateTimeRange.toDateTime,
+              ),
+            ))
+          .get();
 }
