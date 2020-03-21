@@ -23,7 +23,7 @@ class HabitMarks extends Table {
   DateTimeColumn get datetime => dateTime().withDefault(currentDateAndTime)();
 }
 
-QueryExecutor _openConnection() {
+QueryExecutor openConnection() {
   // the LazyDatabase util lets us find the right location for the file async.
   return LazyDatabase(() async {
     // put the database file, called db.sqlite here, into the documents folder
@@ -45,4 +45,7 @@ class Database extends _$Database {
       into(habits).insert(habitsCompanion);
 
   Future<List<Habit>> listHabits() => select(habits).get();
+
+  Stream<List<Habit>> listHabitsStream() => select(habits).watch();
+
 }
