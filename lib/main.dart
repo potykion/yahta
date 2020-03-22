@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:moor/moor.dart' as moor;
 import 'package:provider/provider.dart';
 import 'package:yahta/direction.dart';
 import 'package:yahta/habit.dart';
@@ -51,23 +52,34 @@ class _MyHomePageState extends State<MyHomePage> {
           Flexible(
             child: Swiper(
               itemBuilder: (BuildContext context, int index) => StreamBuilder(
-                stream: Provider.of<Database>(context, listen: false).listHabitsStream(),
+                stream: Provider.of<Database>(context, listen: false)
+                    .listHabitsStream(),
                 builder: (BuildContext context,
                     AsyncSnapshot<List<Habit>> snapshot) {
                   if (snapshot.hasData) {
                     if (snapshot.data.length == 0) {
-                      return Center(child: Text("Пока привычек нет", textAlign: TextAlign.center, ));
+                      return Center(
+                          child: Text(
+                        "Пока привычек нет",
+                        textAlign: TextAlign.center,
+                      ));
                     }
 
                     return ListView(
-                        children: snapshot.data
-                            .map(
-                              (habit) => ListTile(
-                                title: Text(habit.title),
-                                onTap: () {},
-                              ),
-                            )
-                            .toList());
+                      children: snapshot.data
+                          .map(
+                            (habit) => ListTile(
+                              title: Text(habit.title),
+                              onLongPress: () {
+                                var db = Provider.of<Database>(context,
+                                    listen: false);
+                                db.insertHabitMark(HabitMarksCompanion(
+                                    habitId: moor.Value(habit.id)));
+                              },
+                            ),
+                          )
+                          .toList(),
+                    );
                   } else {
                     return CircularProgressIndicator();
                   }
