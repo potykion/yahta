@@ -25,6 +25,9 @@ class HabitMarks extends Table {
 }
 
 QueryExecutor openConnection() {
+  /// Copied from moor tutorial
+  /// https://moor.simonbinder.eu/docs/getting-started/#generating-the-code
+
   // the LazyDatabase util lets us find the right location for the file async.
   return LazyDatabase(() async {
     // put the database file, called db.sqlite here, into the documents folder
@@ -56,14 +59,36 @@ class Database extends _$Database {
       (select(habitMarks)..where((mark) => mark.habitId.equals(habitMarkId)))
           .getSingle();
 
+  Future<List<HabitMark>> listHabitMarksBetween(DateTime from, DateTime to) =>
+      (select(habitMarks)
+            ..where((mark) => mark.datetime.isBetweenValues(from, to)))
+          .get();
+}
+
+class HabitRepo {
+  Database db;
+
+  HabitRepo(this.db);
+
+  Future<int> insertHabit(String title) => db.insertHabit(HabitsCompanion(title: Value(title)));
+
+  Future<List<Habit>> listHabits() => db.listHabits();
+
+  Future<int> insertHabitMark(int habitId, [DateTime dateTime]) =>
+      db.insertHabitMark(
+        HabitMarksCompanion(
+          habitId: Value(habitId),
+          datetime: dateTime == null ? Value.absent() : Value(dateTime),
+        ),
+      );
+
+  Future<HabitMark> getHabitMarkById(int habitMarkId) =>
+      db.getHabitMarkById(habitMarkId);
+
   Future<List<HabitMark>> listHabitMarksForDate(
           DayDateTimeRange dayDateTimeRange) =>
-      (select(habitMarks)
-            ..where(
-              (mark) => mark.datetime.isBetweenValues(
-                dayDateTimeRange.fromDateTime,
-                dayDateTimeRange.toDateTime,
-              ),
-            ))
-          .get();
+      db.listHabitMarksBetween(
+          dayDateTimeRange.fromDateTime, dayDateTimeRange.toDateTime);
+
+  Stream<List<Habit>> listHabitsStream() => db.listHabitsStream();
 }

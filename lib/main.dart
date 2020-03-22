@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:moor/moor.dart' as moor;
 import 'package:provider/provider.dart';
 import 'package:yahta/direction.dart';
 import 'package:yahta/habit.dart';
@@ -12,10 +11,8 @@ void main() => runApp(new MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Provider<Database>(
-      create: (context) {
-        return Database(openConnection());
-      },
+    return Provider<HabitRepo>(
+      create: (context) => HabitRepo(Database(openConnection())),
       child: new MaterialApp(
         title: 'Flutter Demo',
         theme: new ThemeData(
@@ -52,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Flexible(
             child: Swiper(
               itemBuilder: (BuildContext context, int index) => StreamBuilder(
-                stream: Provider.of<Database>(context, listen: false)
+                stream: Provider.of<HabitRepo>(context, listen: false)
                     .listHabitsStream(),
                 builder: (BuildContext context,
                     AsyncSnapshot<List<Habit>> snapshot) {
@@ -65,16 +62,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       ));
                     }
 
+                    // todo isolate id
                     return ListView(
                       children: snapshot.data
                           .map(
                             (habit) => ListTile(
                               title: Text(habit.title),
-                              onLongPress: () {
-                                var db = Provider.of<Database>(context,
-                                    listen: false);
-                                db.insertHabitMark(HabitMarksCompanion(
-                                    habitId: moor.Value(habit.id)));
+                              onLongPress: () async {
+                                var db = Provider.of<HabitRepo>(context, listen: false);
+                                await db.insertHabitMark(habit.id);
                               },
                             ),
                           )
