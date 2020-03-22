@@ -48,58 +48,52 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var previousIndex = 0;
-  // todo move to habit state
-  var currentDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       var state = Provider.of<HabitState>(context, listen: false);
-      await state.loadDateHabits(currentDate);
+      await state.loadDateHabits();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: AppBar(
-        title: Text(DayDateTimeRange(currentDate).toString()),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: <Widget>[
-          Flexible(
-            child: Swiper(
-              itemBuilder: (context, index) => Consumer<HabitState>(
-                builder: (context, state, child) {
+    return Consumer<HabitState>(
+      builder: (BuildContext context, HabitState state, Widget child) =>
+          new Scaffold(
+        appBar: AppBar(
+          title: Text(DayDateTimeRange(state.currentDate).toString()),
+          centerTitle: true,
+        ),
+        body: Column(
+          children: <Widget>[
+            Flexible(
+              child: Swiper(
+                itemBuilder: (context, index) {
                   if (state.loading) {
                     return Center(child: CircularProgressIndicator());
                   }
                   return HabitListView(state.habitVMs);
                 },
-              ),
-              onIndexChanged: (int newIndex) {
-                setState(() {
-                  currentDate = DateTimeSwipe(
-                    currentDate,
-                    SwipeDirection(previousIndex, newIndex),
-                  ).swipedDatetime;
-                  ;
-                  previousIndex = newIndex;
-                });
+                onIndexChanged: (int newIndex) {
+                  state.swipeDate(SwipeDirection(previousIndex, newIndex));
+                  setState(() {
+                    previousIndex = newIndex;
+                  });
 
-                Provider.of<HabitState>(context, listen: false)
-                    .loadDateHabits(currentDate);
-              },
-              itemCount: 3,
+                  state.loadDateHabits();
+                },
+                itemCount: 3,
+              ),
             ),
-          ),
-          Container(
-            child: HabitInput(),
-            margin: EdgeInsets.all(10),
-          )
-        ],
+            Container(
+              child: HabitInput(),
+              margin: EdgeInsets.all(10),
+            )
+          ],
+        ),
       ),
     );
   }

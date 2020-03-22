@@ -108,19 +108,20 @@ class HabitViewModel {
 
 class HabitState extends ChangeNotifier {
   bool loading = false;
-  HabitRepo habitRepo;
-
+  var currentDate = DateTime.now();
   List<HabitViewModel> habitVMs = [];
+
+  HabitRepo habitRepo;
 
   HabitState(this.habitRepo);
 
-  loadDateHabits(DateTime date) async {
+  loadDateHabits() async {
     loading = true;
     notifyListeners();
 
     var habits = await habitRepo.listHabits();
     var habitMarks =
-        await habitRepo.listHabitMarksForDate(DayDateTimeRange(date));
+        await habitRepo.listHabitMarksForDate(DayDateTimeRange(currentDate));
 
     habitVMs = habits
         .map(
@@ -143,10 +144,15 @@ class HabitState extends ChangeNotifier {
   }
 
   createHabitMark(int habitId) async {
-    var habitMarkId = await habitRepo.insertHabitMark(habitId);
+    var habitMarkId = await habitRepo.insertHabitMark(habitId, currentDate);
     var habitMark = await habitRepo.getHabitMarkById(habitMarkId);
     var vm = habitVMs.singleWhere((vm) => vm.habit.id == habitId);
     vm.habitMarks.add(habitMark);
+    notifyListeners();
+  }
+
+  void swipeDate(SwipeDirection swipeDirection) {
+    currentDate = DateTimeSwipe(currentDate, swipeDirection).swipedDatetime;
     notifyListeners();
   }
 }

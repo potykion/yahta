@@ -27,6 +27,8 @@ class _HabitInputState extends State<HabitInput> {
         suffixIcon: IconButton(
             icon: Icon(Icons.add),
             onPressed: () async {
+              // todo create only if controller is not empty
+
               var state = Provider.of<HabitState>(context, listen: false);
               await state.createHabit(controller.text);
 
@@ -61,7 +63,6 @@ class HabitListView extends StatelessWidget {
               title: Text(vm.habit.title),
               onLongPress: () async {
                 var state = Provider.of<HabitState>(context, listen: false);
-                // todo пихать дату
                 await state.createHabitMark(vm.habit.id);
               },
             ),
