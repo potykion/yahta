@@ -11,12 +11,16 @@ void main() => runApp(new MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<HabitState>(
-      create: (context) => HabitState(
-        HabitRepo(
-          Database(openConnection()),
+    return MultiProvider(
+      providers: [
+        Provider<HabitRepo>(
+          create: (_) => HabitRepo(Database(openConnection())),
         ),
-      ),
+        ChangeNotifierProvider<HabitState>(
+          create: (context) =>
+              HabitState(Provider.of<HabitRepo>(context, listen: false)),
+        )
+      ],
       child: new MaterialApp(
         title: 'Flutter Demo',
         theme: new ThemeData(
@@ -41,14 +45,13 @@ class _MyHomePageState extends State<MyHomePage> {
   var previousIndex = 0;
   var currentDate = DateTime.now();
 
-  Future<List<HabitViewModel>> habitVMsFuture;
-
   @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
-
-    var state = Provider.of<HabitState>(context);
-    habitVMsFuture = state.loadDateHabits(currentDate);
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      var state = Provider.of<HabitState>(context, listen: false);
+      await state.loadDateHabits(currentDate);
+    });
   }
 
   @override
@@ -62,29 +65,25 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           Flexible(
             child: Swiper(
-              itemBuilder: (context, index) => FutureBuilder(
-                future: habitVMsFuture,
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (!snapshot.hasData) {
-                    return CircularProgressIndicator();
+              itemBuilder: (context, index) => Consumer<HabitState>(
+                builder: (context, state, child) {
+                  if (state.loading) {
+                    return Center(child: CircularProgressIndicator());
                   }
-                  return HabitListView(snapshot.data);
+                  return HabitListView(state.habitVMs);
                 },
               ),
               onIndexChanged: (int newIndex) {
-                var newDate = DateTimeSwipe(
-                  currentDate,
-                  SwipeDirection(previousIndex, newIndex),
-                ).swipedDatetime;
-
                 setState(() {
-                  currentDate = newDate;
+                  currentDate = DateTimeSwipe(
+                    currentDate,
+                    SwipeDirection(previousIndex, newIndex),
+                  ).swipedDatetime;
+                  ;
                   previousIndex = newIndex;
-                  habitVMsFuture = Provider.of<HabitState>(context, listen: false)
-                      .loadDateHabits(newDate);
-
                 });
 
+                Provider.of<HabitState>(context, listen: false).loadDateHabits(currentDate);
               },
               itemCount: 3,
             ),

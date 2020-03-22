@@ -102,16 +102,16 @@ class HabitViewModel {
 }
 
 class HabitState extends ChangeNotifier {
+  bool loading = false;
   HabitRepo habitRepo;
 
   List<HabitViewModel> habitVMs = [];
 
   HabitState(this.habitRepo);
 
-
   Future<List<HabitViewModel>> loadDateHabits(DateTime date) async {
-    print(date);
-    await Future.delayed(Duration(seconds: 2));
+    loading = true;
+    notifyListeners();
 
     var habits = await habitRepo.listHabits();
     var habitMarks =
@@ -126,7 +126,7 @@ class HabitState extends ChangeNotifier {
         )
         .toList();
 
-//    notifyListeners();
-    return habitVMs;
+    loading = false;
+    notifyListeners();
   }
 }
