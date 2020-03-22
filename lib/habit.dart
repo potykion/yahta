@@ -56,13 +56,16 @@ class Database extends _$Database {
       into(habitMarks).insert(habitMarksCompanion);
 
   Future<HabitMark> getHabitMarkById(int habitMarkId) =>
-      (select(habitMarks)..where((mark) => mark.habitId.equals(habitMarkId)))
+      (select(habitMarks)..where((mark) => mark.id.equals(habitMarkId)))
           .getSingle();
 
   Future<List<HabitMark>> listHabitMarksBetween(DateTime from, DateTime to) =>
       (select(habitMarks)
             ..where((mark) => mark.datetime.isBetweenValues(from, to)))
           .get();
+
+  getHabitById(int habitId) =>
+      (select(habits)..where((habit) => habit.id.equals(habitId))).getSingle();
 }
 
 class HabitRepo {
@@ -92,6 +95,8 @@ class HabitRepo {
           dayDateTimeRange.fromDateTime, dayDateTimeRange.toDateTime);
 
   Stream<List<Habit>> listHabitsStream() => db.listHabitsStream();
+
+  getHabitById(int habitId) => db.getHabitById(habitId);
 }
 
 class HabitViewModel {
@@ -109,7 +114,7 @@ class HabitState extends ChangeNotifier {
 
   HabitState(this.habitRepo);
 
-  Future<List<HabitViewModel>> loadDateHabits(DateTime date) async {
+  loadDateHabits(DateTime date) async {
     loading = true;
     notifyListeners();
 
@@ -127,6 +132,21 @@ class HabitState extends ChangeNotifier {
         .toList();
 
     loading = false;
+    notifyListeners();
+  }
+
+  createHabit(String title) async {
+    var habitId = await habitRepo.insertHabit(title);
+    var habit = await habitRepo.getHabitById(habitId);
+    habitVMs.add(HabitViewModel(habit, []));
+    notifyListeners();
+  }
+
+  createHabitMark(int habitId) async {
+    var habitMarkId = await habitRepo.insertHabitMark(habitId);
+    var habitMark = await habitRepo.getHabitMarkById(habitMarkId);
+    var vm = habitVMs.singleWhere((vm) => vm.habit.id == habitId);
+    vm.habitMarks.add(habitMark);
     notifyListeners();
   }
 }

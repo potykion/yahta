@@ -13,8 +13,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider<Database>(
+          create: (_) => Database(openConnection()),
+          dispose: (_, db) => db.close(),
+        ),
         Provider<HabitRepo>(
-          create: (_) => HabitRepo(Database(openConnection())),
+          create: (context) =>
+              HabitRepo(Provider.of<Database>(context, listen: false)),
         ),
         ChangeNotifierProvider<HabitState>(
           create: (context) =>
@@ -43,6 +48,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var previousIndex = 0;
+  // todo move to habit state
   var currentDate = DateTime.now();
 
   @override
@@ -83,7 +89,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   previousIndex = newIndex;
                 });
 
-                Provider.of<HabitState>(context, listen: false).loadDateHabits(currentDate);
+                Provider.of<HabitState>(context, listen: false)
+                    .loadDateHabits(currentDate);
               },
               itemCount: 3,
             ),

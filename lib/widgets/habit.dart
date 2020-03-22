@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yahta/utils.dart';
 
 import '../habit.dart';
 
@@ -26,8 +27,11 @@ class _HabitInputState extends State<HabitInput> {
         suffixIcon: IconButton(
             icon: Icon(Icons.add),
             onPressed: () async {
-              var db = Provider.of<HabitRepo>(context, listen: false);
-              await db.insertHabit(controller.text);
+              var state = Provider.of<HabitState>(context, listen: false);
+              await state.createHabit(controller.text);
+
+              controller.text = "";
+              removeFocus(context);
             }),
         enabledBorder: OutlineInputBorder(),
         focusedBorder: OutlineInputBorder(),
@@ -51,10 +55,14 @@ class HabitListView extends StatelessWidget {
       children: habits
           .map(
             (vm) => ListTile(
+              leading: CircleAvatar(
+                child: Text(vm.habitMarks.length.toString()),
+              ),
               title: Text(vm.habit.title),
               onLongPress: () async {
-                var db = Provider.of<HabitRepo>(context, listen: false);
-                await db.insertHabitMark(vm.habit.id);
+                var state = Provider.of<HabitState>(context, listen: false);
+                // todo пихать дату
+                await state.createHabitMark(vm.habit.id);
               },
             ),
           )

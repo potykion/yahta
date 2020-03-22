@@ -16,12 +16,19 @@ void main() {
   });
 
   group("Тестим привычки и работу с бд", () {
-    test("Создание привычки & список привычек", () async {
+    test("Создание привычки", () async {
+      var habitId = await repo.insertHabit("Бегать");
+      var habit = await repo.getHabitById(habitId);
+
+      expect(habit.title, "Бегать");
+    });
+
+    test("Список привычек", () async {
       await repo.insertHabit("Бегать");
 
       var habits = await repo.listHabits();
+
       expect(habits.length, 1);
-      expect(habits[0].title, "Бегать");
     });
 
     test("Создание отметки привычки", () async {
