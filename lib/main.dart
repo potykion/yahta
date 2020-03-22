@@ -61,40 +61,41 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Consumer<HabitState>(
-      builder: (BuildContext context, HabitState state, Widget child) =>
-          new Scaffold(
-        appBar: AppBar(
-          title: Text(DayDateTimeRange(state.currentDate).toString()),
-          centerTitle: true,
-        ),
-        body: Column(
-          children: <Widget>[
-            Flexible(
-              child: Swiper(
-                itemBuilder: (context, index) {
-                  if (state.loading) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  return HabitListView(state.habitVMs);
-                },
-                onIndexChanged: (int newIndex) {
-                  state.swipeDate(SwipeDirection(previousIndex, newIndex));
-                  setState(() {
-                    previousIndex = newIndex;
-                  });
+      builder: (BuildContext context, HabitState state, Widget child) {
+        return new Scaffold(
+          appBar: AppBar(
+            title: Text(DayDateTimeRange(state.currentDate).toString()),
+            centerTitle: true,
+          ),
+          body: Column(
+            children: <Widget>[
+              Flexible(
+                child: Swiper(
+                  itemBuilder: (context, index) {
+                    if (state.loading) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    return HabitListView(state.habitVMs);
+                  },
+                  onIndexChanged: (int newIndex) {
+                    state.swipeDate(SwipeDirection(previousIndex, newIndex));
+                    setState(() {
+                      previousIndex = newIndex;
+                    });
 
-                  state.loadDateHabits();
-                },
-                itemCount: 3,
+                    state.loadDateHabits();
+                  },
+                  itemCount: 3,
+                ),
               ),
-            ),
-            Container(
-              child: HabitInput(),
-              margin: EdgeInsets.all(10),
-            )
-          ],
-        ),
-      ),
+              Container(
+                child: HabitInput(),
+                margin: EdgeInsets.all(10),
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 }

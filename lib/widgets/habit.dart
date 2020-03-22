@@ -10,36 +10,37 @@ class HabitInput extends StatefulWidget {
 }
 
 class _HabitInputState extends State<HabitInput> {
-  TextEditingController controller;
+  TextEditingController controller = TextEditingController();
+  bool canAdd = false;
 
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController();
+    controller
+        .addListener(() => setState(() => canAdd = controller.text.length > 0));
   }
 
   @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        hintText: "Заведи привычку",
-        suffixIcon: IconButton(
+  Widget build(BuildContext context) => TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          hintText: "Заведи привычку",
+          suffixIcon: IconButton(
             icon: Icon(Icons.add),
-            onPressed: () async {
-              // todo create only if controller is not empty
+            onPressed: canAdd
+                ? () async {
+                    var state = Provider.of<HabitState>(context, listen: false);
+                    await state.createHabit(controller.text);
 
-              var state = Provider.of<HabitState>(context, listen: false);
-              await state.createHabit(controller.text);
-
-              controller.text = "";
-              removeFocus(context);
-            }),
-        enabledBorder: OutlineInputBorder(),
-        focusedBorder: OutlineInputBorder(),
-      ),
-    );
-  }
+                    controller.text = "";
+                    removeFocus(context);
+                  }
+                : null,
+          ),
+          enabledBorder: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(),
+        ),
+      );
 }
 
 class HabitListView extends StatelessWidget {
