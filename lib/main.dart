@@ -53,32 +53,18 @@ class _MyHomePageState extends State<MyHomePage> {
                     .listHabitsStream(),
                 builder: (BuildContext context,
                     AsyncSnapshot<List<Habit>> snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data.length == 0) {
-                      return Center(
-                          child: Text(
-                        "Пока привычек нет",
-                        textAlign: TextAlign.center,
-                      ));
-                    }
-
-                    // todo isolate id
-                    return ListView(
-                      children: snapshot.data
-                          .map(
-                            (habit) => ListTile(
-                              title: Text(habit.title),
-                              onLongPress: () async {
-                                var db = Provider.of<HabitRepo>(context, listen: false);
-                                await db.insertHabitMark(habit.id);
-                              },
-                            ),
-                          )
-                          .toList(),
-                    );
-                  } else {
+                  if (!snapshot.hasData) {
                     return CircularProgressIndicator();
                   }
+
+                  if (snapshot.data.length == 0) {
+                    return Center(
+                      child: Text("Пока привычек нет",
+                          textAlign: TextAlign.center),
+                    );
+                  }
+
+                  return HabitListView(snapshot.data);
                 },
               ),
               onIndexChanged: (int newIndex) {

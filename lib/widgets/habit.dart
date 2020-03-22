@@ -35,3 +35,24 @@ class _HabitInputState extends State<HabitInput> {
     );
   }
 }
+
+class HabitListView extends StatelessWidget {
+  final List<Habit> habits;
+
+  HabitListView(this.habits);
+
+  @override
+  Widget build(BuildContext context) => ListView(
+        children: habits
+            .map(
+              (habit) => ListTile(
+                title: Text(habit.title),
+                onLongPress: () async {
+                  var db = Provider.of<HabitRepo>(context, listen: false);
+                  await db.insertHabitMark(habit.id);
+                },
+              ),
+            )
+            .toList(),
+      );
+}
