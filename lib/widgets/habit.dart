@@ -37,22 +37,28 @@ class _HabitInputState extends State<HabitInput> {
 }
 
 class HabitListView extends StatelessWidget {
-  final List<Habit> habits;
+  final List<HabitViewModel> habits;
 
   HabitListView(this.habits);
 
   @override
-  Widget build(BuildContext context) => ListView(
-        children: habits
-            .map(
-              (habit) => ListTile(
-                title: Text(habit.title),
-                onLongPress: () async {
-                  var db = Provider.of<HabitRepo>(context, listen: false);
-                  await db.insertHabitMark(habit.id);
-                },
-              ),
-            )
-            .toList(),
-      );
+  Widget build(BuildContext context) {
+    if (habits.length == 0) {
+      return Center(child: Text("Привычек пока нет"));
+    }
+
+    return ListView(
+      children: habits
+          .map(
+            (vm) => ListTile(
+              title: Text(vm.habit.title),
+              onLongPress: () async {
+                var db = Provider.of<HabitRepo>(context, listen: false);
+                await db.insertHabitMark(vm.habit.id);
+              },
+            ),
+          )
+          .toList(),
+    );
+  }
 }

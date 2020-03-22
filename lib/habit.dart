@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:moor/moor.dart';
 import 'package:moor_ffi/moor_ffi.dart';
 import 'package:path_provider/path_provider.dart';
@@ -70,7 +70,8 @@ class HabitRepo {
 
   HabitRepo(this.db);
 
-  Future<int> insertHabit(String title) => db.insertHabit(HabitsCompanion(title: Value(title)));
+  Future<int> insertHabit(String title) =>
+      db.insertHabit(HabitsCompanion(title: Value(title)));
 
   Future<List<Habit>> listHabits() => db.listHabits();
 
@@ -91,4 +92,41 @@ class HabitRepo {
           dayDateTimeRange.fromDateTime, dayDateTimeRange.toDateTime);
 
   Stream<List<Habit>> listHabitsStream() => db.listHabitsStream();
+}
+
+class HabitViewModel {
+  Habit habit;
+  List<HabitMark> habitMarks;
+
+  HabitViewModel(this.habit, this.habitMarks);
+}
+
+class HabitState extends ChangeNotifier {
+  HabitRepo habitRepo;
+
+  List<HabitViewModel> habitVMs = [];
+
+  HabitState(this.habitRepo);
+
+
+  Future<List<HabitViewModel>> loadDateHabits(DateTime date) async {
+    print(date);
+    await Future.delayed(Duration(seconds: 2));
+
+    var habits = await habitRepo.listHabits();
+    var habitMarks =
+        await habitRepo.listHabitMarksForDate(DayDateTimeRange(date));
+
+    habitVMs = habits
+        .map(
+          (habit) => HabitViewModel(
+            habit,
+            habitMarks.where((mark) => mark.habitId == habit.id).toList(),
+          ),
+        )
+        .toList();
+
+//    notifyListeners();
+    return habitVMs;
+  }
 }
