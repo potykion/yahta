@@ -66,6 +66,8 @@ class Database extends _$Database {
 
   getHabitById(int habitId) =>
       (select(habits)..where((habit) => habit.id.equals(habitId))).getSingle();
+
+  updateHabit(Habit updatedHabit) => update(habits).replace(updatedHabit);
 }
 
 class HabitRepo {
@@ -96,7 +98,9 @@ class HabitRepo {
 
   Stream<List<Habit>> listHabitsStream() => db.listHabitsStream();
 
-  getHabitById(int habitId) => db.getHabitById(habitId);
+  Future<Habit> getHabitById(int habitId) => db.getHabitById(habitId);
+
+  updateHabit(Habit updatedHabit) async => db.updateHabit(updatedHabit);
 }
 
 class HabitViewModel {
@@ -110,10 +114,16 @@ class HabitState extends ChangeNotifier {
   bool loading = false;
   var currentDate = DateTime.now();
   List<HabitViewModel> habitVMs = [];
+  HabitViewModel habitToEdit;
 
   HabitRepo habitRepo;
 
   HabitState(this.habitRepo);
+
+  setHabitToEdit(HabitViewModel habitViewModel){
+    habitToEdit = habitViewModel;
+    notifyListeners();
+  }
 
   loadDateHabits() async {
     loading = true;
@@ -138,21 +148,31 @@ class HabitState extends ChangeNotifier {
 
   createHabit(String title) async {
     var habitId = await habitRepo.insertHabit(title);
+
     var habit = await habitRepo.getHabitById(habitId);
     habitVMs.add(HabitViewModel(habit, []));
+
     notifyListeners();
   }
 
   createHabitMark(int habitId) async {
     var habitMarkId = await habitRepo.insertHabitMark(habitId, currentDate);
+
     var habitMark = await habitRepo.getHabitMarkById(habitMarkId);
     var vm = habitVMs.singleWhere((vm) => vm.habit.id == habitId);
     vm.habitMarks.add(habitMark);
+
     notifyListeners();
   }
 
   void swipeDate(SwipeDirection swipeDirection) {
     currentDate = DateTimeSwipe(currentDate, swipeDirection).swipedDatetime;
+
     notifyListeners();
+  }
+
+  void updateHabitToEdit({String title}) async {
+    habitToEdit.habit = habitToEdit.habit.copyWith(title: title);
+    await habitRepo.updateHabit(habitToEdit.habit);
   }
 }

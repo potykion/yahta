@@ -52,5 +52,16 @@ void main() {
 
       expect(marks.length, 2);
     });
+
+    test("Обновление привычки", () async {
+      var habitId = await repo.insertHabit("Бегать");
+      var habit = await repo.getHabitById(habitId);
+
+      var updatedHabit = habit.copyWith(title: "Прыгать");
+      await repo.updateHabit(updatedHabit);
+
+      habit = await repo.getHabitById(habitId);
+      expect(habit.title, "Прыгать");
+    });
   });
 }
