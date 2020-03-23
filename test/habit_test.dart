@@ -63,5 +63,15 @@ void main() {
       habit = await repo.getHabitById(habitId);
       expect(habit.title, "Прыгать");
     });
+
+    test("Удаление привычки", () async {
+      var habitId = await repo.insertHabit("Бегать");
+      var habit = await repo.getHabitById(habitId);
+
+      repo.deleteHabit(habit);
+
+      habit = await repo.getHabitById(habitId);
+      expect(habit, isNull);
+    });
   });
 }

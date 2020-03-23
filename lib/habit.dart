@@ -68,6 +68,8 @@ class Database extends _$Database {
       (select(habits)..where((habit) => habit.id.equals(habitId))).getSingle();
 
   updateHabit(Habit updatedHabit) => update(habits).replace(updatedHabit);
+
+  deleteHabitById(int habitId) => (delete(habits)..where((habit) => habit.id.equals(habitId))).go();
 }
 
 class HabitRepo {
@@ -101,6 +103,8 @@ class HabitRepo {
   Future<Habit> getHabitById(int habitId) => db.getHabitById(habitId);
 
   updateHabit(Habit updatedHabit) async => db.updateHabit(updatedHabit);
+
+  deleteHabit(Habit habit) => db.deleteHabitById(habit.id);
 }
 
 class HabitViewModel {
@@ -165,14 +169,21 @@ class HabitState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void swipeDate(SwipeDirection swipeDirection) {
+  swipeDate(SwipeDirection swipeDirection) {
     currentDate = DateTimeSwipe(currentDate, swipeDirection).swipedDatetime;
 
     notifyListeners();
   }
 
-  void updateHabitToEdit({String title}) async {
+  updateHabitToEdit({String title}) async {
     habitToEdit.habit = habitToEdit.habit.copyWith(title: title);
     await habitRepo.updateHabit(habitToEdit.habit);
+  }
+
+  deleteHabitToEdit() async {
+    await habitRepo.deleteHabit(habitToEdit.habit);
+
+    habitVMs.remove(habitToEdit);
+    notifyListeners();
   }
 }
