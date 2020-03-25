@@ -93,6 +93,14 @@ class _HabitTypePickerState extends State<HabitTypePicker> {
   int _selectedIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+
+    var state = Provider.of<HabitState>(context, listen: false);
+    _selectedIndex = state.habitToEdit.habit.type.index;
+  }
+
+  @override
   Widget build(BuildContext context) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: List.generate(HabitType.values.length, (index) {
@@ -117,10 +125,13 @@ class _HabitTypePickerState extends State<HabitTypePicker> {
             selected: selected,
             labelStyle: selected ? style.selectedLabelStyle : null,
             selectedColor: style.selectedBackgroundColor,
-            onSelected: (bool selected) {
+            onSelected: (bool selected) async {
               setState(() {
                 _selectedIndex = index;
               });
+
+              var state = Provider.of<HabitState>(context, listen: false);
+              await state.updateHabitToEdit(habitType: habitType);
             },
           );
         }),
