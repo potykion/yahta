@@ -60,9 +60,7 @@ class HabitListView extends StatelessWidget {
       children: habits
           .map(
             (vm) => ListTile(
-              leading: CircleAvatar(
-                child: Text(vm.habitMarks.length.toString()),
-              ),
+              leading: HabitMarkCounter(vm),
               title: Text(vm.habit.title),
               onTap: () {
                 var state = Provider.of<HabitState>(context, listen: false);
@@ -136,4 +134,44 @@ class _HabitTypePickerState extends State<HabitTypePicker> {
           );
         }),
       );
+}
+
+class HabitMarkCounter extends StatelessWidget {
+  final HabitViewModel vm;
+
+  HabitMarkCounter(this.vm);
+
+  @override
+  Widget build(BuildContext context) {
+    switch (vm.habit.type) {
+      case HabitType.positive:
+        return CircleAvatar(
+          child: Text(
+            vm.habitMarks.length.toString(),
+            style: TextStyle(color: Colors.white70),
+          ),
+          backgroundColor: vm.habitMarks.length == 0
+              ? Colors.grey.shade400
+              : PositiveHabitTypeStyle().selectedLabelStyle.color,
+        );
+      case HabitType.negative:
+        return CircleAvatar(
+          child: Text(
+            vm.habitMarks.length.toString(),
+            style: TextStyle(color: Colors.white70),
+          ),
+          backgroundColor: vm.habitMarks.length == 0
+              ? PositiveHabitTypeStyle().selectedLabelStyle.color
+              : NegativeHabitTypeStyle().selectedLabelStyle.color,
+        );
+      case HabitType.neutral:
+        return CircleAvatar(
+          child: Text(
+            vm.habitMarks.length.toString(),
+            style: TextStyle(color: Colors.white70),
+          ),
+          backgroundColor: Colors.grey.shade400,
+        );
+    }
+  }
 }
