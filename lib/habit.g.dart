@@ -10,7 +10,8 @@ part of 'habit.dart';
 class Habit extends DataClass implements Insertable<Habit> {
   final int id;
   final String title;
-  Habit({@required this.id, @required this.title});
+  final HabitType type;
+  Habit({@required this.id, @required this.title, @required this.type});
   factory Habit.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
@@ -20,6 +21,8 @@ class Habit extends DataClass implements Insertable<Habit> {
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
       title:
           stringType.mapFromDatabaseResponse(data['${effectivePrefix}title']),
+      type: $HabitsTable.$converter0.mapToDart(
+          intType.mapFromDatabaseResponse(data['${effectivePrefix}type'])),
     );
   }
   factory Habit.fromJson(Map<String, dynamic> json,
@@ -28,6 +31,7 @@ class Habit extends DataClass implements Insertable<Habit> {
     return Habit(
       id: serializer.fromJson<int>(json['id']),
       title: serializer.fromJson<String>(json['title']),
+      type: serializer.fromJson<HabitType>(json['type']),
     );
   }
   @override
@@ -36,6 +40,7 @@ class Habit extends DataClass implements Insertable<Habit> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'title': serializer.toJson<String>(title),
+      'type': serializer.toJson<HabitType>(type),
     };
   }
 
@@ -45,45 +50,57 @@ class Habit extends DataClass implements Insertable<Habit> {
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       title:
           title == null && nullToAbsent ? const Value.absent() : Value(title),
+      type: type == null && nullToAbsent ? const Value.absent() : Value(type),
     );
   }
 
-  Habit copyWith({int id, String title}) => Habit(
+  Habit copyWith({int id, String title, HabitType type}) => Habit(
         id: id ?? this.id,
         title: title ?? this.title,
+        type: type ?? this.type,
       );
   @override
   String toString() {
     return (StringBuffer('Habit(')
           ..write('id: $id, ')
-          ..write('title: $title')
+          ..write('title: $title, ')
+          ..write('type: $type')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => $mrjf($mrjc(id.hashCode, title.hashCode));
+  int get hashCode =>
+      $mrjf($mrjc(id.hashCode, $mrjc(title.hashCode, type.hashCode)));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
-      (other is Habit && other.id == this.id && other.title == this.title);
+      (other is Habit &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.type == this.type);
 }
 
 class HabitsCompanion extends UpdateCompanion<Habit> {
   final Value<int> id;
   final Value<String> title;
+  final Value<HabitType> type;
   const HabitsCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
+    this.type = const Value.absent(),
   });
   HabitsCompanion.insert({
     this.id = const Value.absent(),
     @required String title,
+    this.type = const Value.absent(),
   }) : title = Value(title);
-  HabitsCompanion copyWith({Value<int> id, Value<String> title}) {
+  HabitsCompanion copyWith(
+      {Value<int> id, Value<String> title, Value<HabitType> type}) {
     return HabitsCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
+      type: type ?? this.type,
     );
   }
 }
@@ -113,8 +130,17 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
     );
   }
 
+  final VerificationMeta _typeMeta = const VerificationMeta('type');
+  GeneratedIntColumn _type;
   @override
-  List<GeneratedColumn> get $columns => [id, title];
+  GeneratedIntColumn get type => _type ??= _constructType();
+  GeneratedIntColumn _constructType() {
+    return GeneratedIntColumn('type', $tableName, false,
+        defaultValue: Constant(HabitType.positive.index));
+  }
+
+  @override
+  List<GeneratedColumn> get $columns => [id, title, type];
   @override
   $HabitsTable get asDslTable => this;
   @override
@@ -134,6 +160,7 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
     } else if (isInserting) {
       context.missing(_titleMeta);
     }
+    context.handle(_typeMeta, const VerificationResult.success());
     return context;
   }
 
@@ -154,6 +181,10 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
     if (d.title.present) {
       map['title'] = Variable<String, StringType>(d.title.value);
     }
+    if (d.type.present) {
+      final converter = $HabitsTable.$converter0;
+      map['type'] = Variable<int, IntType>(converter.mapToSql(d.type.value));
+    }
     return map;
   }
 
@@ -161,6 +192,8 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
   $HabitsTable createAlias(String alias) {
     return $HabitsTable(_db, alias);
   }
+
+  static TypeConverter<HabitType, int> $converter0 = const HabitTypeConverter();
 }
 
 class HabitMark extends DataClass implements Insertable<HabitMark> {

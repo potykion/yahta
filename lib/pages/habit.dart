@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yahta/habit.dart';
+import 'package:yahta/widgets/habit.dart';
 
 enum HabitMenuAction { delete }
 
@@ -32,7 +33,6 @@ class _HabitPageState extends State<HabitPage> {
           icon: Icon(Icons.arrow_back),
         ),
         actions: <Widget>[
-//          IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
           PopupMenuButton<HabitMenuAction>(
             itemBuilder: (context) => [
               PopupMenuItem<HabitMenuAction>(
@@ -42,7 +42,8 @@ class _HabitPageState extends State<HabitPage> {
             ],
             onSelected: (HabitMenuAction action) {
               if (action == HabitMenuAction.delete) {
-                Provider.of<HabitState>(context, listen: false).deleteHabitToEdit();
+                Provider.of<HabitState>(context, listen: false)
+                    .deleteHabitToEdit();
                 Navigator.pop(context);
               }
             },
@@ -61,7 +62,8 @@ class _HabitPageState extends State<HabitPage> {
                 enabledBorder: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(),
               ),
-            )
+            ),
+            HabitTypePicker(),
           ],
         ),
       ),

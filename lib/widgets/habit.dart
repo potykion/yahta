@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yahta/pages/habit.dart';
+import 'package:yahta/styles.dart';
 import 'package:yahta/utils.dart';
 
 import '../habit.dart';
@@ -83,4 +84,45 @@ class HabitListView extends StatelessWidget {
   }
 }
 
+class HabitTypePicker extends StatefulWidget {
+  @override
+  _HabitTypePickerState createState() => _HabitTypePickerState();
+}
 
+class _HabitTypePickerState extends State<HabitTypePicker> {
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(HabitType.values.length, (index) {
+          var habitType = HabitType.values[index];
+          HabitTypeStyle style;
+          switch (habitType) {
+            case HabitType.positive:
+              style = PositiveHabitTypeStyle();
+              break;
+            case HabitType.negative:
+              style = NegativeHabitTypeStyle();
+              break;
+            case HabitType.neutral:
+              style = NeutralHabitTypeStyle();
+              break;
+          }
+
+          var selected = index == _selectedIndex;
+
+          return ChoiceChip(
+            label: style.label,
+            selected: selected,
+            labelStyle: selected ? style.selectedLabelStyle : null,
+            selectedColor: style.selectedBackgroundColor,
+            onSelected: (bool selected) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+          );
+        }),
+      );
+}

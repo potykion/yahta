@@ -8,11 +8,30 @@ import 'package:yahta/direction.dart';
 
 part 'habit.g.dart';
 
+enum HabitType { positive, negative, neutral }
+
 /// Собсно привычка
 class Habits extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   TextColumn get title => text()();
+
+  IntColumn get type => integer()
+      .map(const HabitTypeConverter())
+      .withDefault(Constant(HabitType.positive.index))
+       ();
+}
+
+/// Конвертит enum в int
+/// https://moor.simonbinder.eu/docs/advanced-features/type_converters/
+class HabitTypeConverter extends TypeConverter<HabitType, int> {
+  const HabitTypeConverter();
+
+  @override
+  HabitType mapToDart(int fromDb) => HabitType.values[fromDb];
+
+  @override
+  int mapToSql(HabitType value) => value.index;
 }
 
 /// Отметка привычки (2020-03-19 в 23:17 привычка была зафиксирована)
@@ -25,13 +44,10 @@ class HabitMarks extends Table {
 }
 
 QueryExecutor openConnection() {
-  /// Copied from moor tutorial
+  /// Скопировано из туториала по moor
   /// https://moor.simonbinder.eu/docs/getting-started/#generating-the-code
 
-  // the LazyDatabase util lets us find the right location for the file async.
   return LazyDatabase(() async {
-    // put the database file, called db.sqlite here, into the documents folder
-    // for your app.
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'db.sqlite'));
     return VmDatabase(file);
@@ -43,7 +59,21 @@ class Database extends _$Database {
   Database(QueryExecutor e) : super(e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+
+  /// Мигрируем
+  /// https://moor.simonbinder.eu/docs/advanced-features/migrations/
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+      onCreate: (Migrator m) => m.createAll(),
+
+      onUpgrade: (Migrator m, int from, int to) async {
+        if (from == 1) {
+          await m.addColumn(habits, habits.type);
+        }
+      }
+    );
 
   Future<int> insertHabit(HabitsCompanion habitsCompanion) =>
       into(habits).insert(habitsCompanion);
