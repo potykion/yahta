@@ -196,6 +196,7 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                       colorFn: (_, __) => color,
                     ),
                   ],
+                  defaultRenderer: charts.LineRendererConfig(includePoints: true),
                   animate: false,
                   primaryMeasureAxis: new charts.NumericAxisSpec(
                     tickProviderSpec: new charts.BasicNumericTickProviderSpec(

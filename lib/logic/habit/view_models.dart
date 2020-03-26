@@ -26,21 +26,47 @@ class HabitMarkSeries {
   HabitMarkSeries(this.habitMarks, this.weekDateRange);
 
   List<HabitMarkFrequency> get series {
-    var freqMap = groupBy<HabitMark, DateTime>(
-      habitMarks,
-      (mark) => DayDateTimeRange(mark.datetime).fromDateTime,
-    );
+    var freqMap = {};
+
+    if (habitMarks.length <= 0) {
+      this
+          .weekDateRange
+          .dates
+          .forEach((date) => freqMap.putIfAbsent(date, () => null));
+    } else {
+      var sortedHabitMarks = habitMarks
+        ..sort((a, b) => a.datetime.compareTo(b.datetime));
+      // todo заменить на Habit.creationDate и currentDate
+      var minDateTime = DateTimeStart(sortedHabitMarks.first.datetime).dateTime;
+      var maxDateTime = DateTimeStart(sortedHabitMarks.last.datetime).dateTime;
+
+      freqMap = groupBy<HabitMark, DateTime>(
+        sortedHabitMarks,
+        (mark) => DayDateTimeRange(mark.datetime).fromDateTime,
+      );
+
+      this
+          .weekDateRange
+          .dates
+          .where((date) => date.isBefore(minDateTime) || date.isAfter(maxDateTime))
+          .forEach((date) => freqMap.putIfAbsent(date, () => null));
 
     this
         .weekDateRange
         .dates
-        .forEach((date) => freqMap.putIfAbsent(date, () => []));
+        .where((date) => date.isBefore(maxDateTime) || date.isAfter(minDateTime))
+        .forEach((date) => freqMap.putIfAbsent(date, () => <HabitMark>[]));
+    }
 
     return freqMap.entries
-        .map((e) => HabitMarkFrequency(date: e.key, freq: e.value.length))
+        .map((e) => HabitMarkFrequency(
+            date: e.key, freq: e.value != null ? e.value.length : null))
         .toList()
           ..sort((a, b) => a.date.compareTo(b.date));
   }
 
-  get maxFreq => this.series.map((s) => s.freq).reduce(max);
+  get maxFreq {
+    var freqs = this.series.map((s) => s.freq).where((freq) => freq != null);
+    return freqs.length > 0 ? freqs.reduce(max) : 0;
+  }
 }
