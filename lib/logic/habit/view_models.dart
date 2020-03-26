@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:yahta/logic/core/view_models.dart';
 
@@ -39,4 +41,6 @@ class HabitMarkSeries {
         .toList()
           ..sort((a, b) => a.date.compareTo(b.date));
   }
+
+  get maxFreq => this.series.map((s) => s.freq).reduce(max);
 }

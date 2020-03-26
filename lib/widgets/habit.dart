@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:charts_flutter/flutter.dart' as charts;
 
 import 'package:flutter/material.dart';
@@ -157,25 +159,43 @@ class WeeklyHabitMarkChart extends StatefulWidget {
 }
 
 class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
+  WeekDateRange currentDateWeekRange;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    currentDateWeekRange = WeekDateRange(
+        Provider.of<HabitState>(context, listen: false).currentDate);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<HabitState>(
       builder: (BuildContext context, HabitState state, Widget child) {
         var vm = state.habitToEdit;
-        var series = HabitMarkSeries(vm.habitMarks, WeekDateRange(state.currentDate)).series;
+        var series = HabitMarkSeries(vm.habitMarks, currentDateWeekRange);
         var color = HabitTypeThemeMap[vm.habit.type].chartPrimaryColor;
 
         return charts.TimeSeriesChart(
           [
             charts.Series<HabitMarkFrequency, DateTime>(
               id: "Habit marks",
-              data: series,
+              data: series.series,
               domainFn: (HabitMarkFrequency mark, _) => mark.date,
               measureFn: (HabitMarkFrequency mark, _) => mark.freq,
               colorFn: (_, __) => color,
+
             ),
           ],
           animate: false,
+          primaryMeasureAxis: new charts.NumericAxisSpec(
+            tickProviderSpec: new charts.BasicNumericTickProviderSpec(
+              dataIsInWholeNumbers: true,
+              desiredTickCount: series.maxFreq + 2,
+            ),
+          ),
         );
       },
     );
