@@ -14,22 +14,29 @@ class HabitViewModel {
 
 @freezed
 abstract class HabitMarkFrequency with _$HabitMarkFrequency {
-  factory HabitMarkFrequency({DateTime date, int freq}) =
-      _HabitMarkFrequency;
+  factory HabitMarkFrequency({DateTime date, int freq}) = _HabitMarkFrequency;
 }
 
 class HabitMarkSeries {
   List<HabitMark> habitMarks;
+  WeekDateRange weekDateRange;
 
-  HabitMarkSeries(this.habitMarks);
+  HabitMarkSeries(this.habitMarks, this.weekDateRange);
 
-  List<HabitMarkFrequency> get series => groupBy<HabitMark, DateTime>(
-        habitMarks,
-        (mark) => DayDateTimeRange(mark.datetime).fromDateTime,
-      )
-          .entries
-          .map(
-            (e) => HabitMarkFrequency(date: e.key, freq: e.value.length),
-          )
-          .toList();
+  List<HabitMarkFrequency> get series {
+    var freqMap = groupBy<HabitMark, DateTime>(
+      habitMarks,
+      (mark) => DayDateTimeRange(mark.datetime).fromDateTime,
+    );
+
+    this
+        .weekDateRange
+        .dates
+        .forEach((date) => freqMap.putIfAbsent(date, () => []));
+
+    return freqMap.entries
+        .map((e) => HabitMarkFrequency(date: e.key, freq: e.value.length))
+        .toList()
+          ..sort((a, b) => a.date.compareTo(b.date));
+  }
 }

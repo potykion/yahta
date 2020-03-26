@@ -51,20 +51,9 @@ class DayDateTimeRange {
 
   DayDateTimeRange(this.initialDateTime);
 
-  get fromDateTime => DateTime(
-        initialDateTime.year,
-        initialDateTime.month,
-        initialDateTime.day,
-      );
+  get fromDateTime => DateTimeStart(initialDateTime).dateTime;
 
-  get toDateTime => DateTime(
-        initialDateTime.year,
-        initialDateTime.month,
-        initialDateTime.day,
-        23,
-        59,
-        59,
-      );
+  get toDateTime => DateTimeEnd(initialDateTime).dateTime;
 
   matchDatetime(DateTime dateTime) =>
       dateTime.isAfter(fromDateTime) && dateTime.isBefore(toDateTime) ||
@@ -73,4 +62,43 @@ class DayDateTimeRange {
 
   @override
   String toString() => DateFormat("yyyy-MM-dd").format(fromDateTime);
+}
+
+class DateTimeStart {
+  DateTime initial;
+
+  DateTimeStart(this.initial);
+
+  get dateTime => DateTime(initial.year, initial.month, initial.day);
+}
+
+class DateTimeEnd {
+  DateTime initial;
+
+  DateTimeEnd(this.initial);
+
+  get dateTime => DateTime(
+        initial.year,
+        initial.month,
+        initial.day,
+        23,
+        59,
+        59,
+      );
+}
+
+class WeekDateRange {
+  DateTime initial;
+
+  WeekDateRange(this.initial);
+
+  get fromDateTime =>
+      DateTimeStart(initial.add(Duration(days: -initial.weekday + 1))).dateTime;
+
+  get toDateTime =>
+      DateTimeEnd(initial.add(Duration(days: -initial.weekday + 1 + 6)))
+          .dateTime;
+
+  List<DateTime> get dates =>
+      List.generate(7, (days) => this.fromDateTime.add(Duration(days: days)));
 }

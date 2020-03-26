@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:yahta/logic/core/view_models.dart';
 import 'package:yahta/logic/habit/db.dart';
 import 'package:yahta/logic/habit/view_models.dart';
 
@@ -11,10 +12,17 @@ void main() {
         HabitMark(id: 3, habitId: 1, datetime: DateTime(2020, 3, 21)),
       ];
 
-      var series = HabitMarkSeries(marks).series;
+      var weekDateRange = WeekDateRange(DateTime(2020, 3, 20));
+
+      var series = HabitMarkSeries(marks, weekDateRange).series;
       expect(series, [
+        HabitMarkFrequency(date: DateTime(2020, 3, 16), freq: 0),
+        HabitMarkFrequency(date: DateTime(2020, 3, 17), freq: 0),
+        HabitMarkFrequency(date: DateTime(2020, 3, 18), freq: 0),
+        HabitMarkFrequency(date: DateTime(2020, 3, 19), freq: 0),
         HabitMarkFrequency(date: DateTime(2020, 3, 20), freq: 2),
         HabitMarkFrequency(date: DateTime(2020, 3, 21), freq: 1),
+        HabitMarkFrequency(date: DateTime(2020, 3, 22), freq: 0),
       ]);
     });
   });

@@ -2,6 +2,7 @@ import 'package:charts_flutter/flutter.dart' as charts;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yahta/logic/core/view_models.dart';
 import 'package:yahta/logic/habit/db.dart';
 import 'package:yahta/logic/habit/state.dart';
 import 'package:yahta/logic/habit/view_models.dart';
@@ -114,7 +115,8 @@ class _HabitTypePickerState extends State<HabitTypePicker> {
           return ChoiceChip(
             label: theme.chipStyle.label,
             selected: selected,
-            labelStyle: selected ? TextStyle(color: theme.chipStyle.textColor) : null,
+            labelStyle:
+                selected ? TextStyle(color: theme.chipStyle.textColor) : null,
             selectedColor: theme.chipStyle.background,
             onSelected: (bool selected) async {
               setState(() {
@@ -160,20 +162,21 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
     return Consumer<HabitState>(
       builder: (BuildContext context, HabitState state, Widget child) {
         var vm = state.habitToEdit;
-        var series = HabitMarkSeries(vm.habitMarks).series;
+        var series = HabitMarkSeries(vm.habitMarks, WeekDateRange(state.currentDate)).series;
         var color = HabitTypeThemeMap[vm.habit.type].chartPrimaryColor;
 
         return charts.TimeSeriesChart(
-        [
-          charts.Series<HabitMarkFrequency, DateTime>(
-            id: "Habit marks",
-            data: series,
-            domainFn: (HabitMarkFrequency mark, _) => mark.date,
-            measureFn: (HabitMarkFrequency mark, _) => mark.freq,
-            colorFn: (_, __) => color,
-          ),
-        ],
-      );
+          [
+            charts.Series<HabitMarkFrequency, DateTime>(
+              id: "Habit marks",
+              data: series,
+              domainFn: (HabitMarkFrequency mark, _) => mark.date,
+              measureFn: (HabitMarkFrequency mark, _) => mark.freq,
+              colorFn: (_, __) => color,
+            ),
+          ],
+          animate: false,
+        );
       },
     );
   }
