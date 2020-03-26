@@ -1,13 +1,15 @@
+import 'package:charts_flutter/flutter.dart' as charts;
+
 import 'package:flutter/material.dart';
 
 import 'logic/habit/db.dart';
 
 class HabitTypeChipStyle {
   Text label;
-  TextStyle textStyle;
+  Color textColor;
   Color background;
 
-  HabitTypeChipStyle(this.label, this.textStyle, this.background);
+  HabitTypeChipStyle({this.label, this.textColor, this.background});
 }
 
 class HabitTypeCounterStyle {
@@ -23,42 +25,52 @@ class HabitTypeCounterStyle {
 }
 
 class HabitTypeTheme {
+  Color primaryColor;
   HabitTypeChipStyle chipStyle;
   HabitTypeCounterStyle counterStyle;
 
-  HabitTypeTheme(this.chipStyle, this.counterStyle);
+  HabitTypeTheme({this.primaryColor, this.chipStyle, this.counterStyle}) {
+    this.chipStyle.textColor = this.chipStyle.textColor ?? this.primaryColor;
+    this.chipStyle.background = this.chipStyle.background ?? this.primaryColor;
+  }
+
+  get chartPrimaryColor => charts.Color(
+        r: primaryColor.red,
+        g: primaryColor.green,
+        b: primaryColor.blue,
+      );
 }
 
 Map<HabitType, HabitTypeTheme> HabitTypeThemeMap = {
   HabitType.positive: HabitTypeTheme(
-    HabitTypeChipStyle(
-      Text("Полезная"),
-      TextStyle(color: Colors.green.shade700),
-      Colors.green.shade100,
+    primaryColor: Colors.green.shade700,
+    chipStyle: HabitTypeChipStyle(
+      label: Text("Полезная"),
+      background: Colors.green.shade100,
     ),
-    HabitTypeCounterStyle(
+    counterStyle: HabitTypeCounterStyle(
       zeroBackgroundColor: Colors.grey.shade400,
       nonZeroBackgroundColor: Colors.green.shade700,
     ),
   ),
   HabitType.negative: HabitTypeTheme(
-    HabitTypeChipStyle(
-      Text("Вредная"),
-      TextStyle(color: Colors.red.shade700),
-      Colors.red.shade100,
+    primaryColor: Colors.red.shade700,
+    chipStyle: HabitTypeChipStyle(
+      label: Text("Вредная"),
+      background: Colors.red.shade100,
     ),
-    HabitTypeCounterStyle(
+    counterStyle: HabitTypeCounterStyle(
       zeroBackgroundColor: Colors.green.shade700,
       nonZeroBackgroundColor: Colors.red.shade700,
     ),
   ),
   HabitType.neutral: HabitTypeTheme(
-    HabitTypeChipStyle(
-      Text("Нейтральная"),
-      TextStyle(color: Colors.white),
-      Colors.grey.shade600,
+    primaryColor: Colors.grey.shade600,
+    chipStyle: HabitTypeChipStyle(
+      label: Text("Нейтральная"),
+      textColor: Colors.white,
     ),
-    HabitTypeCounterStyle(
+    counterStyle: HabitTypeCounterStyle(
       zeroBackgroundColor: Colors.grey.shade400,
       nonZeroBackgroundColor: Colors.grey.shade400,
     ),

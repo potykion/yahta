@@ -114,7 +114,7 @@ class _HabitTypePickerState extends State<HabitTypePicker> {
           return ChoiceChip(
             label: theme.chipStyle.label,
             selected: selected,
-            labelStyle: selected ? theme.chipStyle.textStyle : null,
+            labelStyle: selected ? TextStyle(color: theme.chipStyle.textColor) : null,
             selectedColor: theme.chipStyle.background,
             onSelected: (bool selected) async {
               setState(() {
@@ -157,18 +157,24 @@ class WeeklyHabitMarkChart extends StatefulWidget {
 class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
   @override
   Widget build(BuildContext context) {
-    var series = HabitMarkSeries(
-      Provider.of<HabitState>(context, listen: false).habitToEdit.habitMarks,
-    ).series;
-    return charts.TimeSeriesChart(
-      [
-        charts.Series<HabitMarkFrequency, DateTime>(
-          id: "Habit marks",
-          data: series,
-          domainFn: (HabitMarkFrequency mark, _) => mark.date,
-          measureFn: (HabitMarkFrequency mark, _) => mark.freq,
-        ),
-      ],
+    return Consumer<HabitState>(
+      builder: (BuildContext context, HabitState state, Widget child) {
+        var vm = state.habitToEdit;
+        var series = HabitMarkSeries(vm.habitMarks).series;
+        var color = HabitTypeThemeMap[vm.habit.type].chartPrimaryColor;
+
+        return charts.TimeSeriesChart(
+        [
+          charts.Series<HabitMarkFrequency, DateTime>(
+            id: "Habit marks",
+            data: series,
+            domainFn: (HabitMarkFrequency mark, _) => mark.date,
+            measureFn: (HabitMarkFrequency mark, _) => mark.freq,
+            colorFn: (_, __) => color,
+          ),
+        ],
+      );
+      },
     );
   }
 }

@@ -73,6 +73,7 @@ class HabitState extends ChangeNotifier {
     habitToEdit.habit =
         habitToEdit.habit.copyWith(title: title, type: habitType);
     await habitRepo.updateHabit(habitToEdit.habit);
+    notifyListeners();
   }
 
   deleteHabitToEdit() async {
