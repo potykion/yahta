@@ -69,10 +69,11 @@ class HabitListView extends StatelessWidget {
                 var state = Provider.of<HabitState>(context, listen: false);
                 await state.setHabitToEdit(vm);
 
-                Navigator.push(
+                await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => HabitPage()),
                 );
+                await state.loadDateHabits();
               },
               onLongPress: () async {
                 var state = Provider.of<HabitState>(context, listen: false);
