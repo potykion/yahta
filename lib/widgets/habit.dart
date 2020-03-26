@@ -103,26 +103,15 @@ class _HabitTypePickerState extends State<HabitTypePicker> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: List.generate(HabitType.values.length, (index) {
           var habitType = HabitType.values[index];
-          HabitTypeStyle style;
-          switch (habitType) {
-            case HabitType.positive:
-              style = PositiveHabitTypeStyle();
-              break;
-            case HabitType.negative:
-              style = NegativeHabitTypeStyle();
-              break;
-            case HabitType.neutral:
-              style = NeutralHabitTypeStyle();
-              break;
-          }
+          HabitTypeTheme theme = HabitTypeThemeMap[habitType];
 
           var selected = index == _selectedIndex;
 
           return ChoiceChip(
-            label: style.label,
+            label: theme.chipStyle.label,
             selected: selected,
-            labelStyle: selected ? style.selectedLabelStyle : null,
-            selectedColor: style.selectedBackgroundColor,
+            labelStyle: selected ? theme.chipStyle.textStyle : null,
+            selectedColor: theme.chipStyle.background,
             onSelected: (bool selected) async {
               setState(() {
                 _selectedIndex = index;
@@ -143,35 +132,15 @@ class HabitMarkCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    switch (vm.habit.type) {
-      case HabitType.positive:
-        return CircleAvatar(
-          child: Text(
-            vm.habitMarks.length.toString(),
-            style: TextStyle(color: Colors.white70),
-          ),
-          backgroundColor: vm.habitMarks.length == 0
-              ? Colors.grey.shade400
-              : PositiveHabitTypeStyle().selectedLabelStyle.color,
-        );
-      case HabitType.negative:
-        return CircleAvatar(
-          child: Text(
-            vm.habitMarks.length.toString(),
-            style: TextStyle(color: Colors.white70),
-          ),
-          backgroundColor: vm.habitMarks.length == 0
-              ? PositiveHabitTypeStyle().selectedLabelStyle.color
-              : NegativeHabitTypeStyle().selectedLabelStyle.color,
-        );
-      case HabitType.neutral:
-        return CircleAvatar(
-          child: Text(
-            vm.habitMarks.length.toString(),
-            style: TextStyle(color: Colors.white70),
-          ),
-          backgroundColor: Colors.grey.shade400,
-        );
-    }
+    var theme = HabitTypeThemeMap[vm.habit.type];
+    return CircleAvatar(
+      child: Text(
+        vm.habitMarks.length.toString(),
+        style: theme.counterStyle.textStyle,
+      ),
+      backgroundColor: vm.habitMarks.length == 0
+          ? theme.counterStyle.zeroBackgroundColor
+          : theme.counterStyle.nonZeroBackgroundColor,
+    );
   }
 }
