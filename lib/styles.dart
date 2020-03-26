@@ -43,10 +43,11 @@ class HabitTypeTheme {
 
 Map<HabitType, HabitTypeTheme> HabitTypeThemeMap = {
   HabitType.positive: HabitTypeTheme(
-    primaryColor: Colors.green.shade700,
+    primaryColor: Colors.green.shade500,
     chipStyle: HabitTypeChipStyle(
       label: Text("Полезная"),
       background: Colors.green.shade100,
+      textColor: Colors.green.shade700
     ),
     counterStyle: HabitTypeCounterStyle(
       zeroBackgroundColor: Colors.grey.shade400,
@@ -54,7 +55,7 @@ Map<HabitType, HabitTypeTheme> HabitTypeThemeMap = {
     ),
   ),
   HabitType.negative: HabitTypeTheme(
-    primaryColor: Colors.red.shade700,
+    primaryColor: Colors.red.shade500,
     chipStyle: HabitTypeChipStyle(
       label: Text("Вредная"),
       background: Colors.red.shade100,
@@ -65,7 +66,7 @@ Map<HabitType, HabitTypeTheme> HabitTypeThemeMap = {
     ),
   ),
   HabitType.neutral: HabitTypeTheme(
-    primaryColor: Colors.grey.shade600,
+    primaryColor: Colors.grey.shade400,
     chipStyle: HabitTypeChipStyle(
       label: Text("Нейтральная"),
       textColor: Colors.white,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yahta/logic/habit/state.dart';
+import 'package:yahta/styles.dart';
 import 'package:yahta/widgets/habit.dart';
 
 enum HabitMenuAction { delete }
@@ -50,6 +51,9 @@ class _HabitPageState extends State<HabitPage> {
           )
         ],
         title: Text("Инфа о привычке"),
+        backgroundColor: HabitTypeThemeMap[
+                Provider.of<HabitState>(context).habitToEdit.habit.type]
+            .primaryColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),
@@ -64,7 +68,9 @@ class _HabitPageState extends State<HabitPage> {
               ),
             ),
             HabitTypePicker(),
-            Flexible(child: WeeklyHabitMarkChart(),)
+            Flexible(
+              child: WeeklyHabitMarkChart(),
+            )
           ],
         ),
       ),
