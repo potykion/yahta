@@ -1,12 +1,8 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:moor/moor.dart';
-import 'package:moor_ffi/moor_ffi.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
-import 'package:yahta/direction.dart';
+import 'package:yahta/logic/core/view_models.dart';
 
-part 'habit.g.dart';
+part 'db.g.dart';
 
 enum HabitType { positive, negative, neutral }
 
@@ -18,8 +14,7 @@ class Habits extends Table {
 
   IntColumn get type => integer()
       .map(const HabitTypeConverter())
-      .withDefault(Constant(HabitType.positive.index))
-       ();
+      .withDefault(Constant(HabitType.positive.index))();
 }
 
 /// Конвертит enum в int
@@ -43,17 +38,6 @@ class HabitMarks extends Table {
   DateTimeColumn get datetime => dateTime().withDefault(currentDateAndTime)();
 }
 
-QueryExecutor openConnection() {
-  /// Скопировано из туториала по moor
-  /// https://moor.simonbinder.eu/docs/getting-started/#generating-the-code
-
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'db.sqlite'));
-    return VmDatabase(file);
-  });
-}
-
 @UseMoor(tables: [Habits, HabitMarks])
 class Database extends _$Database {
   Database(QueryExecutor e) : super(e);
@@ -61,19 +45,16 @@ class Database extends _$Database {
   @override
   int get schemaVersion => 2;
 
-
   /// Мигрируем
   /// https://moor.simonbinder.eu/docs/advanced-features/migrations/
   @override
   MigrationStrategy get migration => MigrationStrategy(
       onCreate: (Migrator m) => m.createAll(),
-
       onUpgrade: (Migrator m, int from, int to) async {
         if (from == 1) {
           await m.addColumn(habits, habits.type);
         }
-      }
-    );
+      });
 
   Future<int> insertHabit(HabitsCompanion habitsCompanion) =>
       into(habits).insert(habitsCompanion);
@@ -99,7 +80,13 @@ class Database extends _$Database {
 
   updateHabit(Habit updatedHabit) => update(habits).replace(updatedHabit);
 
-  deleteHabitById(int habitId) => (delete(habits)..where((habit) => habit.id.equals(habitId))).go();
+  deleteHabitById(int habitId) =>
+      (delete(habits)..where((habit) => habit.id.equals(habitId))).go();
+
+  listHabitMarks(int habitId) => (select(habitMarks)
+        ..where((mark) => mark.habitId.equals(habitId))
+        ..orderBy([(mark) => OrderingTerm(expression: mark.datetime)]))
+      .get();
 }
 
 class HabitRepo {
@@ -135,85 +122,6 @@ class HabitRepo {
   updateHabit(Habit updatedHabit) async => db.updateHabit(updatedHabit);
 
   deleteHabit(Habit habit) => db.deleteHabitById(habit.id);
-}
 
-class HabitViewModel {
-  Habit habit;
-  List<HabitMark> habitMarks;
-
-  HabitViewModel(this.habit, this.habitMarks);
-}
-
-class HabitState extends ChangeNotifier {
-  bool loading = false;
-  var currentDate = DateTime.now();
-  List<HabitViewModel> habitVMs = [];
-  HabitViewModel habitToEdit;
-
-  HabitRepo habitRepo;
-
-  HabitState(this.habitRepo);
-
-  setHabitToEdit(HabitViewModel habitViewModel){
-    habitToEdit = habitViewModel;
-    notifyListeners();
-  }
-
-  loadDateHabits() async {
-    loading = true;
-    notifyListeners();
-
-    var habits = await habitRepo.listHabits();
-    var habitMarks =
-        await habitRepo.listHabitMarksForDate(DayDateTimeRange(currentDate));
-
-    habitVMs = habits
-        .map(
-          (habit) => HabitViewModel(
-            habit,
-            habitMarks.where((mark) => mark.habitId == habit.id).toList(),
-          ),
-        )
-        .toList();
-
-    loading = false;
-    notifyListeners();
-  }
-
-  createHabit(String title) async {
-    var habitId = await habitRepo.insertHabit(title);
-
-    var habit = await habitRepo.getHabitById(habitId);
-    habitVMs.add(HabitViewModel(habit, []));
-
-    notifyListeners();
-  }
-
-  createHabitMark(int habitId) async {
-    var habitMarkId = await habitRepo.insertHabitMark(habitId, currentDate);
-
-    var habitMark = await habitRepo.getHabitMarkById(habitMarkId);
-    var vm = habitVMs.singleWhere((vm) => vm.habit.id == habitId);
-    vm.habitMarks.add(habitMark);
-
-    notifyListeners();
-  }
-
-  swipeDate(SwipeDirection swipeDirection) {
-    currentDate = DateTimeSwipe(currentDate, swipeDirection).swipedDatetime;
-
-    notifyListeners();
-  }
-
-  updateHabitToEdit({String title, HabitType habitType}) async {
-    habitToEdit.habit = habitToEdit.habit.copyWith(title: title, type: habitType);
-    await habitRepo.updateHabit(habitToEdit.habit);
-  }
-
-  deleteHabitToEdit() async {
-    await habitRepo.deleteHabit(habitToEdit.habit);
-
-    habitVMs.remove(habitToEdit);
-    notifyListeners();
-  }
+  listHabitMarks(int habitId) => db.listHabitMarks(habitId);
 }

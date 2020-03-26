@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:yahta/direction.dart';
+import 'package:yahta/logic/core/view_models.dart';
 
 void main() {
-  group("Пакет direction.dart", () {
+  group("Пакет view_models.dart", () {
     test("Определение направления свайпа", () {
       expect(SwipeDirection(0, 2).type, SwipeDirection.RIGHT_TYPE);
       expect(SwipeDirection(2, 1).type, SwipeDirection.RIGHT_TYPE);

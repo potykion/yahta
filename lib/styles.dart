@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:yahta/habit.dart';
+
+import 'logic/habit/db.dart';
 
 class HabitTypeChipStyle {
   Text label;

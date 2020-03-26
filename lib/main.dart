@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:provider/provider.dart';
-import 'package:yahta/direction.dart';
-import 'package:yahta/habit.dart';
+import 'package:yahta/logic/core/view_models.dart';
 import 'package:yahta/widgets/habit.dart';
+
+import 'logic/core/db.dart';
+import 'logic/habit/db.dart';
+import 'logic/habit/state.dart';
 
 void main() => runApp(new MyApp());
 

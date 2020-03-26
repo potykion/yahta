@@ -1,10 +1,13 @@
+import 'package:charts_flutter/flutter.dart' as charts;
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yahta/logic/habit/db.dart';
+import 'package:yahta/logic/habit/state.dart';
+import 'package:yahta/logic/habit/view_models.dart';
 import 'package:yahta/pages/habit.dart';
 import 'package:yahta/styles.dart';
 import 'package:yahta/utils.dart';
-
-import '../habit.dart';
 
 class HabitInput extends StatefulWidget {
   @override
@@ -62,9 +65,9 @@ class HabitListView extends StatelessWidget {
             (vm) => ListTile(
               leading: HabitMarkCounter(vm),
               title: Text(vm.habit.title),
-              onTap: () {
+              onTap: () async {
                 var state = Provider.of<HabitState>(context, listen: false);
-                state.setHabitToEdit(vm);
+                await state.setHabitToEdit(vm);
 
                 Navigator.push(
                   context,
@@ -141,6 +144,30 @@ class HabitMarkCounter extends StatelessWidget {
       backgroundColor: vm.habitMarks.length == 0
           ? theme.counterStyle.zeroBackgroundColor
           : theme.counterStyle.nonZeroBackgroundColor,
+    );
+  }
+}
+
+class WeeklyHabitMarkChart extends StatefulWidget {
+  @override
+  _WeeklyHabitMarkChartState createState() => _WeeklyHabitMarkChartState();
+}
+
+class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
+  @override
+  Widget build(BuildContext context) {
+    var series = HabitMarkSeries(
+      Provider.of<HabitState>(context, listen: false).habitToEdit.habitMarks,
+    ).series;
+    return charts.TimeSeriesChart(
+      [
+        charts.Series<HabitMarkFrequency, DateTime>(
+          id: "Habit marks",
+          data: series,
+          domainFn: (HabitMarkFrequency mark, _) => mark.date,
+          measureFn: (HabitMarkFrequency mark, _) => mark.freq,
+        ),
+      ],
     );
   }
 }

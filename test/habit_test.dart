@@ -1,7 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:moor_ffi/moor_ffi.dart';
-import 'package:yahta/direction.dart';
-import 'package:yahta/habit.dart';
+import 'package:yahta/logic/core/view_models.dart';
+import 'package:yahta/logic/habit/db.dart';
+import 'package:yahta/logic/habit/view_models.dart';
 
 void main() {
   Database _db;
@@ -48,7 +49,8 @@ void main() {
       await repo.insertHabitMark(habitId, DateTime(2020, 3, 20));
       await repo.insertHabitMark(habitId, DateTime(2020, 3, 20));
 
-      var marks = await repo.listHabitMarksForDate(DayDateTimeRange(DateTime(2020, 3, 20)));
+      var marks = await repo
+          .listHabitMarksForDate(DayDateTimeRange(DateTime(2020, 3, 20)));
 
       expect(marks.length, 2);
     });
@@ -72,6 +74,31 @@ void main() {
 
       habit = await repo.getHabitById(habitId);
       expect(habit, isNull);
+    });
+
+    test("Список отметок привычки", () async {
+      var habitId = await repo.insertHabit("Бегать");
+      await repo.insertHabitMark(habitId, DateTime(2020, 3, 21));
+      await repo.insertHabitMark(habitId, DateTime(2020, 3, 20));
+      await repo.insertHabitMark(habitId, DateTime(2020, 3, 20));
+
+      var marks = await repo.listHabitMarks(habitId);
+
+      expect(marks.length, 3);
+    });
+
+    test("Группировка привычек по дате", () async {
+      var habitId = await repo.insertHabit("Бегать");
+      await repo.insertHabitMark(habitId, DateTime(2020, 3, 21));
+      await repo.insertHabitMark(habitId, DateTime(2020, 3, 20));
+      await repo.insertHabitMark(habitId, DateTime(2020, 3, 20));
+
+      var marks = await repo.listHabitMarks(habitId);
+      var series = HabitMarkSeries(marks).series;
+      expect(series, [
+        HabitMarkFrequency(date: DateTime(2020, 3, 20), freq: 2),
+        HabitMarkFrequency(date: DateTime(2020, 3, 21), freq: 1),
+      ]);
     });
   });
 }

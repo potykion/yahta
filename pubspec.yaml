@@ -35,9 +35,17 @@ dependencies:
   # di + state-management
   provider: ^4.0.4
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
+  # графики
+  charts_flutter: ^0.9.0
+
+  # коллеции и операции над ними, типа groupby
+  collection: ^1.14.11
+
+  # датаклассы
+  freezed_annotation:
+
+
+
 
 dev_dependencies:
   flutter_test:
@@ -46,6 +54,10 @@ dev_dependencies:
   # кодогенерация для склайт абстракций
   moor_generator: 2.4.0
   build_runner:
+
+  # кодогенерация датаклассов
+  freezed:
+
 
 
 

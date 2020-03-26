@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'habit.dart';
+part of 'db.dart';
 
 // **************************************************************************
 // MoorGenerator
