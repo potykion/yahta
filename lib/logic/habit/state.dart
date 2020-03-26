@@ -15,9 +15,15 @@ class HabitState extends ChangeNotifier {
   HabitState(this.habitRepo);
 
   setHabitToEdit(HabitViewModel habitViewModel) async {
+    var currentWeekDateRange = WeekDateRange(this.currentDate);
+
     habitToEdit = HabitViewModel(
         habitViewModel.habit,
-        await habitRepo.listHabitMarks(habitViewModel.habit.id)
+        await habitRepo.listHabitMarksBetween(
+          currentWeekDateRange.fromDateTime,
+          currentWeekDateRange.toDateTime,
+          habitViewModel.habit.id,
+        )
     );
 
     notifyListeners();
@@ -29,15 +35,15 @@ class HabitState extends ChangeNotifier {
 
     var habits = await habitRepo.listHabits();
     var habitMarks =
-    await habitRepo.listHabitMarksForDate(DayDateTimeRange(currentDate));
+        await habitRepo.listHabitMarksForDate(DayDateTimeRange(currentDate));
 
     habitVMs = habits
         .map(
           (habit) => HabitViewModel(
-        habit,
-        habitMarks.where((mark) => mark.habitId == habit.id).toList(),
-      ),
-    )
+            habit,
+            habitMarks.where((mark) => mark.habitId == habit.id).toList(),
+          ),
+        )
         .toList();
 
     loading = false;
@@ -82,7 +88,13 @@ class HabitState extends ChangeNotifier {
     habitVMs.remove(habitToEdit);
     notifyListeners();
   }
+
+  loadWeeklyHabits(WeekDateRange weekDateRange) async {
+    habitToEdit.habitMarks = await habitRepo.listHabitMarksBetween(
+      weekDateRange.fromDateTime,
+      weekDateRange.toDateTime,
+      habitToEdit.habit.id,
+    );
+    notifyListeners();
+  }
 }
-
-
-

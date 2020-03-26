@@ -23,7 +23,7 @@ class SwipeDirection {
 
   factory SwipeDirection.left() => SwipeDirection(2, 0);
 
-  get type {
+  String get type {
     if (fromIndex == 0 && toIndex == 2 ||
         fromIndex == 2 && toIndex == 1 ||
         fromIndex == 1 && toIndex == 0) {
@@ -92,13 +92,26 @@ class WeekDateRange {
 
   WeekDateRange(this.initial);
 
-  get fromDateTime =>
+  DateTime get fromDateTime =>
       DateTimeStart(initial.add(Duration(days: -initial.weekday + 1))).dateTime;
 
-  get toDateTime =>
+  DateTime get toDateTime =>
       DateTimeEnd(initial.add(Duration(days: -initial.weekday + 1 + 6)))
           .dateTime;
 
+  WeekDateRange get nextWeekDateRange =>
+      WeekDateRange(toDateTime.add(Duration(days: 1)));
+
+  WeekDateRange get previousWeekDateRange =>
+      WeekDateRange(fromDateTime.add(Duration(days: -1)));
+
   List<DateTime> get dates =>
       List.generate(7, (days) => this.fromDateTime.add(Duration(days: days)));
+
+  @override
+  String toString() {
+    var fromStr = DateFormat("yyyy-MM-dd").format(fromDateTime);
+    var toStr = DateFormat("yyyy-MM-dd").format(toDateTime);
+    return "$fromStr - $toStr";
+  }
 }

@@ -70,10 +70,17 @@ class Database extends _$Database {
       (select(habitMarks)..where((mark) => mark.id.equals(habitMarkId)))
           .getSingle();
 
-  Future<List<HabitMark>> listHabitMarksBetween(DateTime from, DateTime to) =>
-      (select(habitMarks)
-            ..where((mark) => mark.datetime.isBetweenValues(from, to)))
-          .get();
+  Future<List<HabitMark>> listHabitMarksBetween(DateTime from, DateTime to,
+      [int habitId]) {
+    var query = select(habitMarks)
+      ..where((mark) => mark.datetime.isBetweenValues(from, to));
+
+    if (habitId != null) {
+      query = query..where((mark) => mark.habitId.equals(habitId));
+    }
+
+    return query.get();
+  }
 
   getHabitById(int habitId) =>
       (select(habits)..where((habit) => habit.id.equals(habitId))).getSingle();
@@ -124,4 +131,7 @@ class HabitRepo {
   deleteHabit(Habit habit) => db.deleteHabitById(habit.id);
 
   listHabitMarks(int habitId) => db.listHabitMarks(habitId);
+
+  listHabitMarksBetween(DateTime from, DateTime to, [habitId]) =>
+      db.listHabitMarksBetween(from, to, habitId);
 }

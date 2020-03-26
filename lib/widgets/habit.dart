@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:charts_flutter/flutter.dart' as charts;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:provider/provider.dart';
 import 'package:yahta/logic/core/view_models.dart';
 import 'package:yahta/logic/habit/db.dart';
@@ -159,11 +160,11 @@ class WeeklyHabitMarkChart extends StatefulWidget {
 }
 
 class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
+  var previousIndex = 0;
   WeekDateRange currentDateWeekRange;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     currentDateWeekRange = WeekDateRange(
@@ -178,24 +179,49 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
         var series = HabitMarkSeries(vm.habitMarks, currentDateWeekRange);
         var color = HabitTypeThemeMap[vm.habit.type].chartPrimaryColor;
 
-        return charts.TimeSeriesChart(
-          [
-            charts.Series<HabitMarkFrequency, DateTime>(
-              id: "Habit marks",
-              data: series.series,
-              domainFn: (HabitMarkFrequency mark, _) => mark.date,
-              measureFn: (HabitMarkFrequency mark, _) => mark.freq,
-              colorFn: (_, __) => color,
+        return Column(
+          children: <Widget>[
+            Text(
+              "${currentDateWeekRange.toString()}",
+            ),
+            Flexible(
+              child: Swiper(
+                itemBuilder: (_, __) => charts.TimeSeriesChart(
+                  [
+                    charts.Series<HabitMarkFrequency, DateTime>(
+                      id: "Habit marks",
+                      data: series.series,
+                      domainFn: (HabitMarkFrequency mark, _) => mark.date,
+                      measureFn: (HabitMarkFrequency mark, _) => mark.freq,
+                      colorFn: (_, __) => color,
+                    ),
+                  ],
+                  animate: false,
+                  primaryMeasureAxis: new charts.NumericAxisSpec(
+                    tickProviderSpec: new charts.BasicNumericTickProviderSpec(
+                      dataIsInWholeNumbers: true,
+                      desiredTickCount: series.maxFreq + 2,
+                    ),
+                  ),
+                ),
+                itemCount: 3,
+                onIndexChanged: (int newIndex) async {
+                  var swipeDirection = SwipeDirection(previousIndex, newIndex);
 
+                  setState(() {
+                    currentDateWeekRange =
+                        swipeDirection.type == SwipeDirection.LEFT_TYPE
+                            ? currentDateWeekRange.nextWeekDateRange
+                            : currentDateWeekRange.previousWeekDateRange;
+                    previousIndex = newIndex;
+                  });
+
+                  await Provider.of<HabitState>(context, listen: false)
+                      .loadWeeklyHabits(currentDateWeekRange);
+                },
+              ),
             ),
           ],
-          animate: false,
-          primaryMeasureAxis: new charts.NumericAxisSpec(
-            tickProviderSpec: new charts.BasicNumericTickProviderSpec(
-              dataIsInWholeNumbers: true,
-              desiredTickCount: series.maxFreq + 2,
-            ),
-          ),
         );
       },
     );
