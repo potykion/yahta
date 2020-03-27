@@ -68,10 +68,8 @@ class _HabitPageState extends State<HabitPage> {
               ),
             ),
             HabitTypePicker(),
-            Flexible(child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8),
-              child: WeeklyHabitMarkChart(),
-            ),)
+            Flexible(child: WeeklyHabitMarkChart()),
+
           ],
         ),
       ),

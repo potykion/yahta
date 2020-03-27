@@ -9,10 +9,16 @@ class HabitState extends ChangeNotifier {
   var currentDate = DateTime.now();
   List<HabitViewModel> habitVMs = [];
   HabitViewModel habitToEdit;
+  DateTime habitMarkStatsDate;
 
   HabitRepo habitRepo;
 
   HabitState(this.habitRepo);
+
+  setHabitMarkStatsDate(DateTime dateTime) {
+    habitMarkStatsDate = dateTime;
+    notifyListeners();
+  }
 
   setHabitToEdit(HabitViewModel habitViewModel) async {
     var currentWeekDateRange = WeekDateRange(this.currentDate);
