@@ -22,6 +22,7 @@ void main() {
       var habit = await repo.getHabitById(habitId);
 
       expect(habit.title, "Бегать");
+      expect(habit.createdDate, isNotNull);
     });
 
     test("Список привычек", () async {

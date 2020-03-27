@@ -48,30 +48,7 @@ class Database extends _$Database {
   Database(QueryExecutor e) : super(e);
 
   @override
-  int get schemaVersion => 3;
-
-  /// Мигрируем
-  /// https://moor.simonbinder.eu/docs/advanced-features/migrations/
-  @override
-  MigrationStrategy get migration => MigrationStrategy(
-      onCreate: (Migrator m) => m.createAll(),
-      onUpgrade: (Migrator m, int from, int to) async {
-        if (from == 1) {
-          await m.addColumn(habits, habits.type);
-        }
-        if (from == 2) {
-          await m.addColumn(habits, habits.createdDate);
-          await m.addColumn(habits, habits.stoppedDate);
-        }
-      },
-      beforeOpen: (details) async {
-        if (details.hadUpgrade && details.versionBefore == 2) {
-          // 2020-03-27 были созданы все "боевые" привычки
-          await update(habits).write(
-            HabitsCompanion(createdDate: Value(DateTime(2020, 3, 27))),
-          );
-        }
-      });
+  int get schemaVersion => 1;
 
   Future<int> insertHabit(HabitsCompanion habitsCompanion) =>
       into(habits).insert(habitsCompanion);
@@ -119,7 +96,7 @@ class HabitRepo {
   HabitRepo(this.db);
 
   Future<int> insertHabit(String title) =>
-      db.insertHabit(HabitsCompanion(title: Value(title)));
+      db.insertHabit(HabitsCompanion.insert(title: title));
 
   Future<List<Habit>> listHabits() => db.listHabits();
 
