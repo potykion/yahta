@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:provider/provider.dart';
-import 'package:yahta/logic/core/swipe.dart';
+import 'package:yahta/widgets/core.dart';
 import 'package:yahta/widgets/habit.dart';
 
 import 'logic/core/date.dart';
@@ -51,8 +50,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var previousIndex = 0;
-
   @override
   void initState() {
     super.initState();
@@ -74,22 +71,17 @@ class _MyHomePageState extends State<MyHomePage> {
           body: Column(
             children: <Widget>[
               Flexible(
-                child: Swiper(
-                  itemBuilder: (context, index) {
+                child: DayDateTimeRangeSwiper(
+                  builder: (BuildContext context) {
                     if (state.loading) {
                       return Center(child: CircularProgressIndicator());
                     }
                     return HabitListView(state.habitVMs);
                   },
-                  onIndexChanged: (int newIndex) {
-                    state.swipeDate(SwipeDirection(previousIndex, newIndex));
-                    setState(() {
-                      previousIndex = newIndex;
-                    });
-
+                  onDaySwipe: (DateTime dateTime) {
+                    state.setCurrentDate(dateTime);
                     state.loadDateHabits();
                   },
-                  itemCount: 3,
                 ),
               ),
               Container(

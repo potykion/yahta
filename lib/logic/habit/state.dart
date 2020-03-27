@@ -8,14 +8,18 @@ import 'db.dart';
 class HabitState extends ChangeNotifier {
   /// Флаг загрузки списка привычек
   bool loading = false;
+
   /// Текущая дата, используется для фильтра отметок привычек за день
   /// Используется в основном в списке привычек
   /// todo Мб имеет смысл туда его перенести
   var currentDate = DateTime.now();
+
   /// Список привычек и отметок за день
   List<HabitViewModel> habitVMs = [];
+
   /// Редактируемая привычка
   HabitViewModel habitToEdit;
+
   /// Дата, по которой фильтруются отметки редактируемой привычки
   DateTime habitMarkStatsDate;
 
@@ -23,6 +27,11 @@ class HabitState extends ChangeNotifier {
   HabitRepo habitRepo;
 
   HabitState(this.habitRepo);
+
+  setCurrentDate(DateTime dateTime) {
+    this.currentDate = dateTime;
+    notifyListeners();
+  }
 
   setHabitMarkStatsDate(DateTime dateTime) {
     habitMarkStatsDate = dateTime;
@@ -38,8 +47,7 @@ class HabitState extends ChangeNotifier {
           currentWeekDateRange.fromDateTime,
           currentWeekDateRange.toDateTime,
           habitViewModel.habit.id,
-        )
-    );
+        ));
 
     notifyListeners();
   }
@@ -65,19 +73,12 @@ class HabitState extends ChangeNotifier {
     notifyListeners();
   }
 
-
   createHabitMark(int habitId) async {
     var habitMarkId = await habitRepo.insertHabitMark(habitId, currentDate);
 
     var habitMark = await habitRepo.getHabitMarkById(habitMarkId);
     var vm = habitVMs.singleWhere((vm) => vm.habit.id == habitId);
     vm.habitMarks.add(habitMark);
-
-    notifyListeners();
-  }
-
-  swipeDate(SwipeDirection swipeDirection) {
-    currentDate = DateTimeSwipe(currentDate, swipeDirection).swipedDatetime;
 
     notifyListeners();
   }

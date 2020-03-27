@@ -168,8 +168,7 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
   void initState() {
     super.initState();
 
-    currentDateWeekRange = WeekDateRange(
-        Provider.of<HabitState>(context, listen: false).currentDate);
+    currentDateWeekRange = WeekDateRange(DateTime.now());
   }
 
   @override
