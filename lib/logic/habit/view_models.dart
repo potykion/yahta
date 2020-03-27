@@ -19,6 +19,17 @@ abstract class HabitMarkFrequency with _$HabitMarkFrequency {
   factory HabitMarkFrequency({DateTime date, int freq}) = _HabitMarkFrequency;
 }
 
+
+/// Генерит данные для построения графика (с учетом пустышек и нуликов)
+/// Пустышки - это то, что перед точкой A и после точки C
+/// Нулики - это то, что на оси X между A и C (например, точка B) - то есть 0 - то есть отметки привычки в этот день не было
+///
+/// ^
+/// |
+/// |                C
+/// |        .     /
+/// |      /  \  /
+/// +----A-----B--------->
 class HabitMarkSeries {
   List<HabitMark> habitMarks;
   WeekDateRange weekDateRange;
@@ -58,6 +69,7 @@ class HabitMarkSeries {
         .forEach((date) => freqMap.putIfAbsent(date, () => <HabitMark>[]));
     }
 
+    // todo ленгз можно сразу получить мб
     return freqMap.entries
         .map((e) => HabitMarkFrequency(
             date: e.key, freq: e.value != null ? e.value.length : null))

@@ -7,8 +7,8 @@ void main() {
   group("Тестим вью-модели", () {
     test("Группировка привычек по дате", () async {
       var marks = [
-        HabitMark(id: 1, habitId: 1, datetime: DateTime(2020, 3, 20)),
-        HabitMark(id: 2, habitId: 1, datetime: DateTime(2020, 3, 20)),
+        HabitMark(id: 1, habitId: 1, datetime: DateTime(2020, 3, 19)),
+        HabitMark(id: 2, habitId: 1, datetime: DateTime(2020, 3, 19)),
         HabitMark(id: 3, habitId: 1, datetime: DateTime(2020, 3, 21)),
       ];
 
@@ -16,13 +16,13 @@ void main() {
 
       var series = HabitMarkSeries(marks, weekDateRange);
       expect(series.series, [
-        HabitMarkFrequency(date: DateTime(2020, 3, 16), freq: 0),
-        HabitMarkFrequency(date: DateTime(2020, 3, 17), freq: 0),
-        HabitMarkFrequency(date: DateTime(2020, 3, 18), freq: 0),
-        HabitMarkFrequency(date: DateTime(2020, 3, 19), freq: 0),
-        HabitMarkFrequency(date: DateTime(2020, 3, 20), freq: 2),
+        HabitMarkFrequency(date: DateTime(2020, 3, 16), freq: null),
+        HabitMarkFrequency(date: DateTime(2020, 3, 17), freq: null),
+        HabitMarkFrequency(date: DateTime(2020, 3, 18), freq: null),
+        HabitMarkFrequency(date: DateTime(2020, 3, 19), freq: 2),
+        HabitMarkFrequency(date: DateTime(2020, 3, 20), freq: 0),
         HabitMarkFrequency(date: DateTime(2020, 3, 21), freq: 1),
-        HabitMarkFrequency(date: DateTime(2020, 3, 22), freq: 0),
+        HabitMarkFrequency(date: DateTime(2020, 3, 22), freq: null),
       ]);
       expect(series.maxFreq, 2);
     });

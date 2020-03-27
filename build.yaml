@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      moor_generator:
+        # Запускаем moor-кодогенерацию только для 1 файла
+        generate_for:
+          - lib/logic/habit/db.dart

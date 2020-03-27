@@ -15,6 +15,11 @@ class Habits extends Table {
   IntColumn get type => integer()
       .map(const HabitTypeConverter())
       .withDefault(Constant(HabitType.positive.index))();
+
+  DateTimeColumn get createdDate =>
+      dateTime().withDefault(currentDateAndTime)();
+
+  DateTimeColumn get stoppedDate => dateTime().nullable()();
 }
 
 /// Конвертит enum в int
@@ -43,7 +48,7 @@ class Database extends _$Database {
   Database(QueryExecutor e) : super(e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   /// Мигрируем
   /// https://moor.simonbinder.eu/docs/advanced-features/migrations/
@@ -53,6 +58,18 @@ class Database extends _$Database {
       onUpgrade: (Migrator m, int from, int to) async {
         if (from == 1) {
           await m.addColumn(habits, habits.type);
+        }
+        if (from == 2) {
+          await m.addColumn(habits, habits.createdDate);
+          await m.addColumn(habits, habits.stoppedDate);
+        }
+      },
+      beforeOpen: (details) async {
+        if (details.hadUpgrade && details.versionBefore == 2) {
+          // 2020-03-27 были созданы все "боевые" привычки
+          await update(habits).write(
+            HabitsCompanion(createdDate: Value(DateTime(2020, 3, 27))),
+          );
         }
       });
 

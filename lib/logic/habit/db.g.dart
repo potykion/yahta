@@ -11,18 +11,30 @@ class Habit extends DataClass implements Insertable<Habit> {
   final int id;
   final String title;
   final HabitType type;
-  Habit({@required this.id, @required this.title, @required this.type});
+  final DateTime createdDate;
+  final DateTime stoppedDate;
+  Habit(
+      {@required this.id,
+      @required this.title,
+      @required this.type,
+      @required this.createdDate,
+      this.stoppedDate});
   factory Habit.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
     final intType = db.typeSystem.forDartType<int>();
     final stringType = db.typeSystem.forDartType<String>();
+    final dateTimeType = db.typeSystem.forDartType<DateTime>();
     return Habit(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
       title:
           stringType.mapFromDatabaseResponse(data['${effectivePrefix}title']),
       type: $HabitsTable.$converter0.mapToDart(
           intType.mapFromDatabaseResponse(data['${effectivePrefix}type'])),
+      createdDate: dateTimeType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_date']),
+      stoppedDate: dateTimeType
+          .mapFromDatabaseResponse(data['${effectivePrefix}stopped_date']),
     );
   }
   factory Habit.fromJson(Map<String, dynamic> json,
@@ -32,6 +44,8 @@ class Habit extends DataClass implements Insertable<Habit> {
       id: serializer.fromJson<int>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       type: serializer.fromJson<HabitType>(json['type']),
+      createdDate: serializer.fromJson<DateTime>(json['createdDate']),
+      stoppedDate: serializer.fromJson<DateTime>(json['stoppedDate']),
     );
   }
   @override
@@ -41,6 +55,8 @@ class Habit extends DataClass implements Insertable<Habit> {
       'id': serializer.toJson<int>(id),
       'title': serializer.toJson<String>(title),
       'type': serializer.toJson<HabitType>(type),
+      'createdDate': serializer.toJson<DateTime>(createdDate),
+      'stoppedDate': serializer.toJson<DateTime>(stoppedDate),
     };
   }
 
@@ -51,56 +67,90 @@ class Habit extends DataClass implements Insertable<Habit> {
       title:
           title == null && nullToAbsent ? const Value.absent() : Value(title),
       type: type == null && nullToAbsent ? const Value.absent() : Value(type),
+      createdDate: createdDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdDate),
+      stoppedDate: stoppedDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(stoppedDate),
     );
   }
 
-  Habit copyWith({int id, String title, HabitType type}) => Habit(
+  Habit copyWith(
+          {int id,
+          String title,
+          HabitType type,
+          DateTime createdDate,
+          DateTime stoppedDate}) =>
+      Habit(
         id: id ?? this.id,
         title: title ?? this.title,
         type: type ?? this.type,
+        createdDate: createdDate ?? this.createdDate,
+        stoppedDate: stoppedDate ?? this.stoppedDate,
       );
   @override
   String toString() {
     return (StringBuffer('Habit(')
           ..write('id: $id, ')
           ..write('title: $title, ')
-          ..write('type: $type')
+          ..write('type: $type, ')
+          ..write('createdDate: $createdDate, ')
+          ..write('stoppedDate: $stoppedDate')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      $mrjf($mrjc(id.hashCode, $mrjc(title.hashCode, type.hashCode)));
+  int get hashCode => $mrjf($mrjc(
+      id.hashCode,
+      $mrjc(
+          title.hashCode,
+          $mrjc(type.hashCode,
+              $mrjc(createdDate.hashCode, stoppedDate.hashCode)))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
       (other is Habit &&
           other.id == this.id &&
           other.title == this.title &&
-          other.type == this.type);
+          other.type == this.type &&
+          other.createdDate == this.createdDate &&
+          other.stoppedDate == this.stoppedDate);
 }
 
 class HabitsCompanion extends UpdateCompanion<Habit> {
   final Value<int> id;
   final Value<String> title;
   final Value<HabitType> type;
+  final Value<DateTime> createdDate;
+  final Value<DateTime> stoppedDate;
   const HabitsCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.type = const Value.absent(),
+    this.createdDate = const Value.absent(),
+    this.stoppedDate = const Value.absent(),
   });
   HabitsCompanion.insert({
     this.id = const Value.absent(),
     @required String title,
     this.type = const Value.absent(),
+    this.createdDate = const Value.absent(),
+    this.stoppedDate = const Value.absent(),
   }) : title = Value(title);
   HabitsCompanion copyWith(
-      {Value<int> id, Value<String> title, Value<HabitType> type}) {
+      {Value<int> id,
+      Value<String> title,
+      Value<HabitType> type,
+      Value<DateTime> createdDate,
+      Value<DateTime> stoppedDate}) {
     return HabitsCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
       type: type ?? this.type,
+      createdDate: createdDate ?? this.createdDate,
+      stoppedDate: stoppedDate ?? this.stoppedDate,
     );
   }
 }
@@ -139,8 +189,34 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
         defaultValue: Constant(HabitType.positive.index));
   }
 
+  final VerificationMeta _createdDateMeta =
+      const VerificationMeta('createdDate');
+  GeneratedDateTimeColumn _createdDate;
   @override
-  List<GeneratedColumn> get $columns => [id, title, type];
+  GeneratedDateTimeColumn get createdDate =>
+      _createdDate ??= _constructCreatedDate();
+  GeneratedDateTimeColumn _constructCreatedDate() {
+    return GeneratedDateTimeColumn('created_date', $tableName, false,
+        defaultValue: currentDateAndTime);
+  }
+
+  final VerificationMeta _stoppedDateMeta =
+      const VerificationMeta('stoppedDate');
+  GeneratedDateTimeColumn _stoppedDate;
+  @override
+  GeneratedDateTimeColumn get stoppedDate =>
+      _stoppedDate ??= _constructStoppedDate();
+  GeneratedDateTimeColumn _constructStoppedDate() {
+    return GeneratedDateTimeColumn(
+      'stopped_date',
+      $tableName,
+      true,
+    );
+  }
+
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, title, type, createdDate, stoppedDate];
   @override
   $HabitsTable get asDslTable => this;
   @override
@@ -161,6 +237,14 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
       context.missing(_titleMeta);
     }
     context.handle(_typeMeta, const VerificationResult.success());
+    if (d.createdDate.present) {
+      context.handle(_createdDateMeta,
+          createdDate.isAcceptableValue(d.createdDate.value, _createdDateMeta));
+    }
+    if (d.stoppedDate.present) {
+      context.handle(_stoppedDateMeta,
+          stoppedDate.isAcceptableValue(d.stoppedDate.value, _stoppedDateMeta));
+    }
     return context;
   }
 
@@ -184,6 +268,14 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
     if (d.type.present) {
       final converter = $HabitsTable.$converter0;
       map['type'] = Variable<int, IntType>(converter.mapToSql(d.type.value));
+    }
+    if (d.createdDate.present) {
+      map['created_date'] =
+          Variable<DateTime, DateTimeType>(d.createdDate.value);
+    }
+    if (d.stoppedDate.present) {
+      map['stopped_date'] =
+          Variable<DateTime, DateTimeType>(d.stoppedDate.value);
     }
     return map;
   }
