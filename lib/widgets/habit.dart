@@ -176,14 +176,16 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
     return Consumer<HabitState>(
       builder: (BuildContext context, HabitState state, Widget child) {
         var vm = state.habitToEdit;
-        var series = HabitMarkSeries(vm.habitMarks, currentDateWeekRange);
+        var series = HabitMarkSeries(
+            vm.habitMarks,
+            currentDateWeekRange,
+            vm.habit.createdDate,
+            DateTime.now()
+        );
         var color = HabitTypeThemeMap[vm.habit.type].chartPrimaryColor;
 
         return Column(
           children: <Widget>[
-            Text(
-              "${currentDateWeekRange.toString()}",
-            ),
             Flexible(
               child: Swiper(
                 itemBuilder: (_, __) => charts.TimeSeriesChart(
@@ -196,8 +198,14 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                       colorFn: (_, __) => color,
                     ),
                   ],
+                  behaviors: [
+                    charts.ChartTitle(currentDateWeekRange.toString())
+                  ],
+                  // Точечки
                   defaultRenderer: charts.LineRendererConfig(includePoints: true),
+                  // Отключение анимации (бесит, когда отрабатывает анимация при смене типа привычки или свайпе)
                   animate: false,
+                  // По оси Y откладывается на 1 деление больше (если макс значение в series - 1, то график будет рисоваться для 2)
                   primaryMeasureAxis: new charts.NumericAxisSpec(
                     tickProviderSpec: new charts.BasicNumericTickProviderSpec(
                       dataIsInWholeNumbers: true,

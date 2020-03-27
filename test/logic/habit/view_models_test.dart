@@ -14,7 +14,10 @@ void main() {
 
       var weekDateRange = WeekDateRange(DateTime(2020, 3, 20));
 
-      var series = HabitMarkSeries(marks, weekDateRange);
+      var series = HabitMarkSeries(
+          marks, weekDateRange,
+          DateTime(2020, 3, 19), DateTime(2020, 3, 21)
+      );
       expect(series.series, [
         HabitMarkFrequency(date: DateTime(2020, 3, 16), freq: null),
         HabitMarkFrequency(date: DateTime(2020, 3, 17), freq: null),

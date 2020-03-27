@@ -21,7 +21,7 @@ abstract class HabitMarkFrequency with _$HabitMarkFrequency {
 
 
 /// Генерит данные для построения графика (с учетом пустышек и нуликов)
-/// Пустышки - это то, что перед точкой A и после точки C
+/// Пустышки - это то, что перед точкой A (minDateTime) и после точки C (maxDateTime)
 /// Нулики - это то, что на оси X между A и C (например, точка B) - то есть 0 - то есть отметки привычки в этот день не было
 ///
 /// ^
@@ -33,8 +33,14 @@ abstract class HabitMarkFrequency with _$HabitMarkFrequency {
 class HabitMarkSeries {
   List<HabitMark> habitMarks;
   WeekDateRange weekDateRange;
+  DateTime minDateTime;
+  DateTime maxDateTime;
 
-  HabitMarkSeries(this.habitMarks, this.weekDateRange);
+  HabitMarkSeries(this.habitMarks, this.weekDateRange, this.minDateTime, this.maxDateTime) {
+    if (this.minDateTime.isAfter(weekDateRange.fromDateTime)) {
+      this.minDateTime = weekDateRange.fromDateTime;
+    }
+  }
 
   List<HabitMarkFrequency> get series {
     var freqMap = {};
@@ -47,9 +53,6 @@ class HabitMarkSeries {
     } else {
       var sortedHabitMarks = habitMarks
         ..sort((a, b) => a.datetime.compareTo(b.datetime));
-      // todo заменить на Habit.creationDate и currentDate
-      var minDateTime = DateTimeStart(sortedHabitMarks.first.datetime).dateTime;
-      var maxDateTime = DateTimeStart(sortedHabitMarks.last.datetime).dateTime;
 
       freqMap = groupBy<HabitMark, DateTime>(
         sortedHabitMarks,
