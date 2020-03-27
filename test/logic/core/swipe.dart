@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:yahta/logic/core/view_models.dart';
+import 'package:yahta/logic/core/swipe.dart';
 
 void main() {
-  group("Пакет view_models.dart", () {
+  group("Пакет swipe.dart", () {
     test("Определение направления свайпа", () {
       expect(SwipeDirection(0, 2).type, SwipeDirection.RIGHT_TYPE);
       expect(SwipeDirection(2, 1).type, SwipeDirection.RIGHT_TYPE);
@@ -25,18 +25,6 @@ void main() {
           DateTime(2020, 3, 18));
       expect(DateTimeSwipe(dateTime, SwipeDirection.left()).swipedDatetime,
           DateTime(2020, 3, 20));
-    });
-
-    test("Дейтренжи дня", () {
-      var dateTime = DateTime(2020, 3, 19, 23, 2);
-      var range = DayDateTimeRange(dateTime);
-
-      expect(range.fromDateTime, DateTime(2020, 3, 19));
-      expect(range.toDateTime, DateTime(2020, 3, 19, 23, 59, 59));
-
-      expect(range.matchDatetime(dateTime), true);
-
-      expect(range.toString(), "2020-03-19");
     });
   });
 }

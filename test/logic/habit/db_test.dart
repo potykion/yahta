@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:moor_ffi/moor_ffi.dart';
-import 'package:yahta/logic/core/view_models.dart';
+import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/db.dart';
 
 

@@ -1,16 +1,25 @@
 import 'package:flutter/cupertino.dart';
-import 'package:yahta/logic/core/view_models.dart';
+import 'package:yahta/logic/core/date.dart';
+import 'package:yahta/logic/core/swipe.dart';
 import 'package:yahta/logic/habit/view_models.dart';
 
 import 'db.dart';
 
 class HabitState extends ChangeNotifier {
+  /// Флаг загрузки списка привычек
   bool loading = false;
+  /// Текущая дата, используется для фильтра отметок привычек за день
+  /// Используется в основном в списке привычек
+  /// todo Мб имеет смысл туда его перенести
   var currentDate = DateTime.now();
+  /// Список привычек и отметок за день
   List<HabitViewModel> habitVMs = [];
+  /// Редактируемая привычка
   HabitViewModel habitToEdit;
+  /// Дата, по которой фильтруются отметки редактируемой привычки
   DateTime habitMarkStatsDate;
 
+  /// Абстракция над бд
   HabitRepo habitRepo;
 
   HabitState(this.habitRepo);
@@ -56,14 +65,6 @@ class HabitState extends ChangeNotifier {
     notifyListeners();
   }
 
-  createHabit(String title) async {
-    var habitId = await habitRepo.insertHabit(title);
-
-    var habit = await habitRepo.getHabitById(habitId);
-    habitVMs.add(HabitViewModel(habit, []));
-
-    notifyListeners();
-  }
 
   createHabitMark(int habitId) async {
     var habitMarkId = await habitRepo.insertHabitMark(habitId, currentDate);
@@ -77,6 +78,15 @@ class HabitState extends ChangeNotifier {
 
   swipeDate(SwipeDirection swipeDirection) {
     currentDate = DateTimeSwipe(currentDate, swipeDirection).swipedDatetime;
+
+    notifyListeners();
+  }
+
+  createHabit(String title) async {
+    var habitId = await habitRepo.insertHabit(title);
+
+    var habit = await habitRepo.getHabitById(habitId);
+    habitVMs.add(HabitViewModel(habit, []));
 
     notifyListeners();
   }

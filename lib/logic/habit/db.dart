@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:moor/moor.dart';
-import 'package:yahta/logic/core/view_models.dart';
+import 'package:yahta/logic/core/date.dart';
 
 part 'db.g.dart';
 

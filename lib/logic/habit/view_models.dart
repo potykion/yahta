@@ -1,7 +1,8 @@
 import 'dart:math';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:yahta/logic/core/view_models.dart';
+import 'package:yahta/logic/core/date.dart';
+import 'package:yahta/logic/core/swipe.dart';
 
 import 'db.dart';
 
