@@ -6,12 +6,12 @@ import 'package:yahta/widgets/habit.dart';
 
 enum HabitMenuAction { delete }
 
-class HabitPage extends StatefulWidget {
+class EditHabitPage extends StatefulWidget {
   @override
-  _HabitPageState createState() => _HabitPageState();
+  _EditHabitPageState createState() => _EditHabitPageState();
 }
 
-class _HabitPageState extends State<HabitPage> {
+class _EditHabitPageState extends State<EditHabitPage> {
   TextEditingController controller = TextEditingController();
 
   @override
@@ -59,6 +59,7 @@ class _HabitPageState extends State<HabitPage> {
         padding: const EdgeInsets.all(10),
         child: Column(
           children: <Widget>[
+            // todo изолировать
             TextField(
               controller: controller,
               decoration: InputDecoration(

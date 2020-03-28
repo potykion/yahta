@@ -71,13 +71,10 @@ class _MyHomePageState extends State<MyHomePage> {
           body: Column(
             children: <Widget>[
               Flexible(
-                child: DayDateTimeRangeSwiper(
-                  builder: (BuildContext context) {
-                    if (state.loading) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    return HabitListView(state.habitVMs);
-                  },
+                child: DaySwiper(
+                  builder: (BuildContext context) => state.loading
+                      ? Center(child: CircularProgressIndicator())
+                      : HabitListView(state.habitVMs),
                   onDaySwipe: (DateTime dateTime) {
                     state.setCurrentDate(dateTime);
                     state.loadDateHabits();

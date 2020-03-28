@@ -76,7 +76,7 @@ class HabitListView extends StatelessWidget {
 
                 await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => HabitPage()),
+                  MaterialPageRoute(builder: (_) => EditHabitPage()),
                 );
                 await state.loadDateHabits();
               },

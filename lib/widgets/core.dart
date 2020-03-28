@@ -5,20 +5,20 @@ import 'package:yahta/logic/core/swipe.dart';
 typedef Builder = Widget Function(BuildContext context);
 typedef OnDaySwipe = void Function(DateTime dateTime);
 
-class DayDateTimeRangeSwiper extends StatefulWidget {
+class DaySwiper extends StatefulWidget {
   final Builder builder;
   final OnDaySwipe onDaySwipe;
   final DateTime currentDate;
 
-  DayDateTimeRangeSwiper(
+  DaySwiper(
       {@required this.builder, @required this.onDaySwipe, currentDate})
       : currentDate = currentDate ?? DateTime.now();
 
   @override
-  _DayDateTimeRangeSwiperState createState() => _DayDateTimeRangeSwiperState();
+  _DaySwiperState createState() => _DaySwiperState();
 }
 
-class _DayDateTimeRangeSwiperState extends State<DayDateTimeRangeSwiper> {
+class _DaySwiperState extends State<DaySwiper> {
   DateTime currentDate;
   var previousIndex = 0;
 
