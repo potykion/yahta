@@ -13,6 +13,7 @@ import 'package:yahta/logic/habit/view_models.dart';
 import 'package:yahta/pages/habit.dart';
 import 'package:yahta/styles.dart';
 import 'package:yahta/utils.dart';
+import 'package:yahta/widgets/core.dart';
 
 class HabitInput extends StatefulWidget {
   @override
@@ -176,64 +177,60 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
     return Consumer<HabitState>(
       builder: (BuildContext context, HabitState state, Widget child) {
         var vm = state.habitToEdit;
-        var series = HabitMarkSeries(vm.habitMarks, currentDateWeekRange,
-            vm.habit.createdDate, DateTime.now());
+        var series = HabitMarkSeries(
+          vm.habitMarks,
+          currentDateWeekRange,
+          vm.habit.createdDate,
+          DateTime.now(),
+        );
         var color = HabitTypeThemeMap[vm.habit.type].chartPrimaryColor;
 
         List<Widget> widgets = [
           Flexible(
-            child: Swiper(
-              itemBuilder: (_, __) => charts.TimeSeriesChart(
-                [
-                  charts.Series<HabitMarkFrequency, DateTime>(
-                    id: "Habit marks",
-                    data: series.series,
-                    domainFn: (HabitMarkFrequency mark, _) => mark.date,
-                    measureFn: (HabitMarkFrequency mark, _) => mark.freq,
-                    colorFn: (_, __) => color,
-                  ),
-                ],
-                selectionModels: [
-                  new charts.SelectionModelConfig(
-                      type: charts.SelectionModelType.info,
-                      changedListener: (selected) {
-                        var state =
-                            Provider.of<HabitState>(context, listen: false);
-                        state.setHabitMarkStatsDate(
-                            selected.selectedDatum.first.datum.date);
-                      })
-                ],
-                behaviors: [charts.ChartTitle(currentDateWeekRange.toString())],
-                // Точечки
-                defaultRenderer: charts.LineRendererConfig(includePoints: true),
-                // Отключение анимации (бесит, когда отрабатывает анимация при смене типа привычки или свайпе)
-                animate: false,
-                // По оси Y откладывается на 1 деление больше (если макс значение в series - 1, то график будет рисоваться для 2)
-                primaryMeasureAxis: new charts.NumericAxisSpec(
-                  tickProviderSpec: new charts.BasicNumericTickProviderSpec(
-                    dataIsInWholeNumbers: true,
-                    desiredTickCount: series.maxFreq + 2,
-                  ),
+              child: WeekSwiper(
+            builder: (context) => charts.TimeSeriesChart(
+              [
+                charts.Series<HabitMarkFrequency, DateTime>(
+                  id: "Habit marks",
+                  data: series.series,
+                  domainFn: (HabitMarkFrequency mark, _) => mark.date,
+                  measureFn: (HabitMarkFrequency mark, _) => mark.freq,
+                  colorFn: (_, __) => color,
+                ),
+              ],
+              selectionModels: [
+                new charts.SelectionModelConfig(
+                    type: charts.SelectionModelType.info,
+                    changedListener: (selected) {
+                      var state =
+                          Provider.of<HabitState>(context, listen: false);
+                      state.setHabitMarkStatsDate(
+                          selected.selectedDatum.first.datum.date);
+                    })
+              ],
+              behaviors: [charts.ChartTitle(currentDateWeekRange.toString())],
+              // Точечки
+              defaultRenderer: charts.LineRendererConfig(includePoints: true),
+              // Отключение анимации (бесит, когда отрабатывает анимация при смене типа привычки или свайпе)
+              animate: false,
+              // По оси Y откладывается на 1 деление больше (если макс значение в series - 1, то график будет рисоваться для 2)
+              primaryMeasureAxis: new charts.NumericAxisSpec(
+                tickProviderSpec: new charts.BasicNumericTickProviderSpec(
+                  dataIsInWholeNumbers: true,
+                  desiredTickCount: series.maxFreq + 2,
                 ),
               ),
-              itemCount: 3,
-              onIndexChanged: (int newIndex) async {
-                var swipeDirection = SwipeDirection(previousIndex, newIndex);
-
-                setState(() {
-                  currentDateWeekRange =
-                      swipeDirection.type == SwipeDirection.LEFT_TYPE
-                          ? currentDateWeekRange.nextWeekDateRange
-                          : currentDateWeekRange.previousWeekDateRange;
-                  previousIndex = newIndex;
-                });
-
-                var state = Provider.of<HabitState>(context, listen: false);
-                await state.loadWeeklyHabits(currentDateWeekRange);
-                state.setHabitMarkStatsDate(null);
-              },
             ),
-          ),
+            onWeekChange: (WeekDateRange weekDateRange) async {
+              setState(() {
+                currentDateWeekRange = weekDateRange;
+              });
+
+              var state = Provider.of<HabitState>(context, listen: false);
+              await state.loadWeeklyHabits(currentDateWeekRange);
+              state.setHabitMarkStatsDate(null);
+            },
+          )),
         ];
 
         if (state.habitMarkStatsDate != null) {
@@ -253,11 +250,14 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                           )
                           .toList(),
                     )
-                  : Text("Нет привычек за ${DayDateTimeRange(state.habitMarkStatsDate).toString()}"),
+                  : Text(
+                      "Нет привычек за ${DayDateTimeRange(state.habitMarkStatsDate).toString()}"),
             ),
           );
         } else {
-          widgets.add(Flexible(child: Container(),));
+          widgets.add(Flexible(
+            child: Container(),
+          ));
         }
 
         return Column(children: widgets);
