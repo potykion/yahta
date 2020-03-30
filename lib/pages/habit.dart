@@ -55,12 +55,12 @@ class _EditHabitPageState extends State<EditHabitPage> {
                 Provider.of<HabitState>(context).habitToEdit.habit.type]
             .primaryColor,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: <Widget>[
-            // todo изолировать
-            TextField(
+      body: Column(
+        children: <Widget>[
+          // todo изолировать
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: TextField(
               controller: controller,
               decoration: InputDecoration(
                 labelText: "Название",
@@ -68,11 +68,11 @@ class _EditHabitPageState extends State<EditHabitPage> {
                 focusedBorder: OutlineInputBorder(),
               ),
             ),
-            HabitTypePicker(),
-            Flexible(child: WeeklyHabitMarkChart()),
+          ),
+          HabitTypePicker(),
+          Flexible(child: WeeklyHabitMarkChart()),
 
-          ],
-        ),
+        ],
       ),
     );
   }
