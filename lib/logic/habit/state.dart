@@ -122,7 +122,7 @@ class HabitState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateHabitMark(HabitMark mark, {DateTime datetime}) async {
+  updateHabitMark(HabitMark mark, {DateTime datetime}) async {
     var updatedMark = mark.copyWith(datetime: datetime);
 
     await habitRepo.updateHabitMark(updatedMark);

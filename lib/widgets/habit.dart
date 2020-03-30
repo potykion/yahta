@@ -275,9 +275,19 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                                         trailing: IconButton(
                                           icon: Icon(Icons.edit),
                                           onPressed: () {
-                                              DatePicker.showTimePicker(context, onConfirm: (DateTime newDateTime) async {
-                                                await Provider.of<HabitState>(context, listen: false).updateHabitMark(mark, datetime: newDateTime);
-                                              });
+                                            DatePicker.showTimePicker(
+                                              context,
+                                              onConfirm:
+                                                  // todo refactor this!!!!!!!!!
+                                                  (DateTime newDateTime) async {
+                                                await Provider.of<HabitState>(
+                                                        context,
+                                                        listen: false)
+                                                    .updateHabitMark(mark,
+                                                        datetime: newDateTime);
+                                              },
+                                              currentTime: mark.datetime,
+                                            );
                                           },
                                         ),
                                       ),
@@ -293,7 +303,9 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                                         color: Colors.red.shade500,
                                       ),
                                       onDismissed: (_) async {
-                                        await Provider.of<HabitState>(context, listen: false).deleteHabitMark(mark);
+                                        await Provider.of<HabitState>(context,
+                                                listen: false)
+                                            .deleteHabitMark(mark);
                                       },
                                     ),
                                   )
