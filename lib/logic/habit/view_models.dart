@@ -57,6 +57,7 @@ abstract class HabitMarkFrequency with _$HabitMarkFrequency {
 /// |      /  \  /
 /// +----A-----B--------->
 class HabitMarkSeries {
+  // todo rename to dates / frequencies & rename class to WeekFrequencyChartSeries
   List<HabitMark> habitMarks;
   WeekDateRange weekDateRange;
   DateTime minDateTime;

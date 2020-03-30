@@ -1,9 +1,11 @@
 import 'dart:math';
 
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/core/swipe.dart';
@@ -198,6 +200,7 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                   colorFn: (_, __) => color,
                 ),
               ],
+              // todo надо бы чтоб с charts.SelectionModelType.action заробило
               selectionModels: [
                 new charts.SelectionModelConfig(
                     type: charts.SelectionModelType.info,
@@ -208,6 +211,7 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                           selected.selectedDatum.first.datum.date);
                     })
               ],
+              // todo replace with Text + textStyle:title
               behaviors: [charts.ChartTitle(currentDateWeekRange.toString())],
               // Точечки
               defaultRenderer: charts.LineRendererConfig(includePoints: true),
@@ -220,6 +224,7 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                   desiredTickCount: series.maxFreq + 2,
                 ),
               ),
+              // todo по оси x отступы сделать от 0 и конца графика
             ),
             onWeekChange: (WeekDateRange weekDateRange) async {
               setState(() {
@@ -242,14 +247,48 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
           widgets.add(
             Flexible(
               child: dateMarks.length > 0
-                  ? ListView(
-                      children: dateMarks
-                          .map(
-                            (mark) =>
-                                ListTile(title: Text(mark.datetime.toString())),
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 16,
+                            ),
+                            child: Text(
+                              DateFormat.MMMMEEEEd()
+                                  .format(state.habitMarkStatsDate),
+                              style: Theme.of(context).textTheme.title,
+                            ),
+                          ),
+                          Flexible(
+                            child: ListView(
+                              children: dateMarks
+                                  .map(
+                                    (mark) => Dismissible(
+                                        child: ListTile(
+                                          title: Text(
+                                            DateFormat.Hms()
+                                                .format(mark.datetime),
+                                          ),
+                                          trailing: IconButton(
+                                            icon: Icon(Icons.edit),
+                                            onPressed: () {},
+                                          ),
+                                        ),
+                                        key: Key(mark.id.toString()),
+                                        direction: DismissDirection.endToStart,
+                                        background: Container(
+                                          child: ListTile(
+                                            trailing: Icon(Icons.delete, color: Colors.red.shade100,),
+                                          ),
+                                          color: Colors.red.shade500,
+                                        )),
+                                  )
+                                  .toList(),
+                            ),
                           )
-                          .toList(),
-                    )
+                        ])
                   : Text(
                       "Нет привычек за ${DayDateTimeRange(state.habitMarkStatsDate).toString()}"),
             ),
