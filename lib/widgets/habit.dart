@@ -266,24 +266,31 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                               children: dateMarks
                                   .map(
                                     (mark) => Dismissible(
+                                      child: ListTile(
+                                        title: Text(
+                                          DateFormat.Hms()
+                                              .format(mark.datetime),
+                                        ),
+                                        trailing: IconButton(
+                                          icon: Icon(Icons.edit),
+                                          onPressed: () {},
+                                        ),
+                                      ),
+                                      key: Key(mark.id.toString()),
+                                      direction: DismissDirection.endToStart,
+                                      background: Container(
                                         child: ListTile(
-                                          title: Text(
-                                            DateFormat.Hms()
-                                                .format(mark.datetime),
-                                          ),
-                                          trailing: IconButton(
-                                            icon: Icon(Icons.edit),
-                                            onPressed: () {},
+                                          trailing: Icon(
+                                            Icons.delete,
+                                            color: Colors.red.shade100,
                                           ),
                                         ),
-                                        key: Key(mark.id.toString()),
-                                        direction: DismissDirection.endToStart,
-                                        background: Container(
-                                          child: ListTile(
-                                            trailing: Icon(Icons.delete, color: Colors.red.shade100,),
-                                          ),
-                                          color: Colors.red.shade500,
-                                        )),
+                                        color: Colors.red.shade500,
+                                      ),
+                                      onDismissed: (_) async {
+                                        await Provider.of<HabitState>(context, listen: false).deleteHabitMark(mark);
+                                      },
+                                    ),
                                   )
                                   .toList(),
                             ),

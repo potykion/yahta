@@ -88,6 +88,16 @@ void main() {
       expect(marks.length, 3);
     });
 
+    test("Удаление отметки привычки", () async {
+      var habitId = await repo.insertHabit("Бегать");
+      var markId = await repo.insertHabitMark(habitId, DateTime(2020, 3, 21));
+      var mark = await repo.getHabitMarkById(markId);
+
+      repo.deleteHabitMark(mark);
+
+      mark = await repo.getHabitMarkById(markId);
+      expect(mark, isNull);
+    });
 
   });
 }

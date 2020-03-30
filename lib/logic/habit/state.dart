@@ -5,6 +5,7 @@ import 'package:yahta/logic/habit/view_models.dart';
 
 import 'db.dart';
 
+// todo split to ListHabitState & EditHabitState
 class HabitState extends ChangeNotifier {
   /// Флаг загрузки списка привычек
   bool loading = false;
@@ -112,6 +113,13 @@ class HabitState extends ChangeNotifier {
       weekDateRange.toDateTime,
       habitToEdit.habit.id,
     );
+    notifyListeners();
+  }
+
+  deleteHabitMark(HabitMark mark) async {
+    await habitRepo.deleteHabitMark(mark);
+
+    habitToEdit.habitMarks.remove(mark);
     notifyListeners();
   }
 }

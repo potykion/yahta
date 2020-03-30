@@ -88,6 +88,10 @@ class Database extends _$Database {
         ..where((mark) => mark.habitId.equals(habitId))
         ..orderBy([(mark) => OrderingTerm(expression: mark.datetime)]))
       .get();
+
+  deleteHabitMarkById(int id) =>
+      (delete(habitMarks)..where((mark) => mark.id.equals(id))).go();
+
 }
 
 class HabitRepo {
@@ -128,4 +132,6 @@ class HabitRepo {
 
   listHabitMarksBetween(DateTime from, DateTime to, [habitId]) =>
       db.listHabitMarksBetween(from, to, habitId);
+
+  deleteHabitMark(HabitMark mark) => db.deleteHabitMarkById(mark.id);
 }
