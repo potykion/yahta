@@ -34,11 +34,6 @@ class HabitTypeTheme {
     this.chipStyle.background = this.chipStyle.background ?? this.primaryColor;
   }
 
-  get chartPrimaryColor => charts.Color(
-        r: primaryColor.red,
-        g: primaryColor.green,
-        b: primaryColor.blue,
-      );
 }
 
 Map<HabitType, HabitTypeTheme> HabitTypeThemeMap = {

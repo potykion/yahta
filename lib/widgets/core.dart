@@ -1,7 +1,9 @@
+import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/core/swipe.dart';
+import 'package:yahta/logic/habit/view_models.dart';
 
 typedef Builder = Widget Function(BuildContext context);
 typedef OnDaySwipe = void Function(DateTime dateTime);
@@ -89,6 +91,56 @@ class _WeekSwiperState extends State<WeekSwiper> {
 
         widget.onWeekChange(currentWeekDateRange);
       },
+    );
+  }
+}
+
+typedef OnFrequencySelect = void Function(HabitMarkFrequency selectedFreq);
+
+class FrequencyChart extends StatelessWidget {
+  final HabitMarkSeries series;
+  final Color color;
+  final OnFrequencySelect onFrequencySelect;
+
+  FrequencyChart({this.series, this.color, this.onFrequencySelect});
+
+  @override
+  Widget build(BuildContext context) {
+    return charts.TimeSeriesChart(
+      [
+        charts.Series<HabitMarkFrequency, DateTime>(
+          id: "Freqs",
+          data: series.series,
+          domainFn: (HabitMarkFrequency mark, _) => mark.date,
+          measureFn: (HabitMarkFrequency mark, _) => mark.freq,
+          colorFn: (_, __) => charts.ColorUtil.fromDartColor(color),
+        ),
+      ],
+      // todo надо чтоб линия строилась при нажатии
+      //  наверн оно не робит из-за того часто стейт обновляется
+      // Событие нажатия на точку графика
+      selectionModels: [
+        charts.SelectionModelConfig(
+            type: charts.SelectionModelType.info,
+            changedListener: (selected) {
+              var selectedFreq =
+                  selected.selectedDatum.first.datum as HabitMarkFrequency;
+              onFrequencySelect(selectedFreq);
+            }),
+      ],
+      // Точечки
+      defaultRenderer: charts.LineRendererConfig(includePoints: true),
+      // Отключение анимации (бесит, когда отрабатывает анимация при смене типа привычки или свайпе)
+      animate: false,
+      // По оси Y откладывается на 1 деление больше (если макс значение в series - 1, то график будет рисоваться для 2)
+      primaryMeasureAxis: new charts.NumericAxisSpec(
+        tickProviderSpec: new charts.BasicNumericTickProviderSpec(
+          dataIsInWholeNumbers: true,
+          desiredTickCount: series.maxFreq + 2,
+        ),
+        showAxisLine: true,
+      ),
+      // todo по оси x отступы сделать от 0 и конца графика
     );
   }
 }

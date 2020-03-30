@@ -180,52 +180,41 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
     return Consumer<HabitState>(
       builder: (BuildContext context, HabitState state, Widget child) {
         HabitViewModel vm = state.habitToEdit;
-        var series = HabitMarkSeries(
+        HabitMarkSeries series = HabitMarkSeries(
           vm.habitMarks,
           currentDateWeekRange,
           vm.minChartDateTime,
           vm.maxChartDateTime,
         );
-        var color = HabitTypeThemeMap[vm.habit.type].chartPrimaryColor;
+        var color = HabitTypeThemeMap[vm.habit.type].primaryColor;
 
         List<Widget> widgets = [
           Flexible(
               child: WeekSwiper(
-            builder: (context) => charts.TimeSeriesChart(
-              [
-                charts.Series<HabitMarkFrequency, DateTime>(
-                  id: "Habit marks",
-                  data: series.series,
-                  domainFn: (HabitMarkFrequency mark, _) => mark.date,
-                  measureFn: (HabitMarkFrequency mark, _) => mark.freq,
-                  colorFn: (_, __) => color,
+            builder: (context) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(top: 8, left: 16),
+                  child: Text(
+                    currentDateWeekRange.toString(),
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ),
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: FrequencyChart(
+                        series: series,
+                        color: color,
+                        onFrequencySelect: (selectedFreq) {
+                          var state =
+                              Provider.of<HabitState>(context, listen: false);
+                          state.setHabitMarkStatsDate(selectedFreq.date);
+                        }),
+                  ),
                 ),
               ],
-              // todo надо бы чтоб с charts.SelectionModelType.action заробило
-              selectionModels: [
-                new charts.SelectionModelConfig(
-                    type: charts.SelectionModelType.info,
-                    changedListener: (selected) {
-                      var state =
-                          Provider.of<HabitState>(context, listen: false);
-                      state.setHabitMarkStatsDate(
-                          selected.selectedDatum.first.datum.date);
-                    })
-              ],
-              // todo replace with Text + textStyle:title
-              behaviors: [charts.ChartTitle(currentDateWeekRange.toString())],
-              // Точечки
-              defaultRenderer: charts.LineRendererConfig(includePoints: true),
-              // Отключение анимации (бесит, когда отрабатывает анимация при смене типа привычки или свайпе)
-              animate: false,
-              // По оси Y откладывается на 1 деление больше (если макс значение в series - 1, то график будет рисоваться для 2)
-              primaryMeasureAxis: new charts.NumericAxisSpec(
-                tickProviderSpec: new charts.BasicNumericTickProviderSpec(
-                  dataIsInWholeNumbers: true,
-                  desiredTickCount: series.maxFreq + 2,
-                ),
-              ),
-              // todo по оси x отступы сделать от 0 и конца графика
             ),
             onWeekChange: (WeekDateRange weekDateRange) async {
               setState(() {
@@ -252,10 +241,7 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 16,
-                            ),
+                            padding: EdgeInsets.only(top: 8, left: 16),
                             child: Text(
                               DateFormat.MMMMEEEEd()
                                   .format(state.habitMarkStatsDate),
