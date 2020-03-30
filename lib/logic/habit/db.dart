@@ -53,7 +53,7 @@ class Database extends _$Database {
   Future<int> insertHabit(HabitsCompanion habitsCompanion) =>
       into(habits).insert(habitsCompanion);
 
-  Future<List<Habit>> listHabits() => select(habits).get();
+  Future<List<Habit>> listHabits() => (select(habits)..orderBy([(mark) => OrderingTerm(expression: mark.type)])).get();
 
   Stream<List<Habit>> listHabitsStream() => select(habits).watch();
 

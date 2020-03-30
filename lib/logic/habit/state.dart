@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:yahta/logic/core/date.dart';
-import 'package:yahta/logic/core/swipe.dart';
 import 'package:yahta/logic/habit/view_models.dart';
 
 import 'db.dart';
