@@ -4,6 +4,7 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -273,7 +274,11 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                                         ),
                                         trailing: IconButton(
                                           icon: Icon(Icons.edit),
-                                          onPressed: () {},
+                                          onPressed: () {
+                                              DatePicker.showTimePicker(context, onConfirm: (DateTime newDateTime) async {
+                                                await Provider.of<HabitState>(context, listen: false).updateHabitMark(mark, datetime: newDateTime);
+                                              });
+                                          },
                                         ),
                                       ),
                                       key: Key(mark.id.toString()),

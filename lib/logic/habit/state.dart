@@ -121,4 +121,15 @@ class HabitState extends ChangeNotifier {
     habitToEdit.habitMarks.remove(mark);
     notifyListeners();
   }
+
+  void updateHabitMark(HabitMark mark, {DateTime datetime}) async {
+    var updatedMark = mark.copyWith(datetime: datetime);
+
+    await habitRepo.updateHabitMark(updatedMark);
+
+    habitToEdit.habitMarks =
+        habitToEdit.habitMarks.where((m) => m.id != mark.id).toList() +
+            [updatedMark];
+    notifyListeners();
+  }
 }

@@ -92,6 +92,8 @@ class Database extends _$Database {
   deleteHabitMarkById(int id) =>
       (delete(habitMarks)..where((mark) => mark.id.equals(id))).go();
 
+  updateHabitMark(HabitMark mark) => update(habitMarks).replace(mark);
+
 }
 
 class HabitRepo {
@@ -134,4 +136,6 @@ class HabitRepo {
       db.listHabitMarksBetween(from, to, habitId);
 
   deleteHabitMark(HabitMark mark) => db.deleteHabitMarkById(mark.id);
+
+  updateHabitMark(HabitMark mark) => db.updateHabitMark(mark);
 }
