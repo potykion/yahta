@@ -176,12 +176,12 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
   Widget build(BuildContext context) {
     return Consumer<HabitState>(
       builder: (BuildContext context, HabitState state, Widget child) {
-        var vm = state.habitToEdit;
+        HabitViewModel vm = state.habitToEdit;
         var series = HabitMarkSeries(
           vm.habitMarks,
           currentDateWeekRange,
-          vm.habit.createdDate,
-          DateTime.now(),
+          vm.minChartDateTime,
+          vm.maxChartDateTime,
         );
         var color = HabitTypeThemeMap[vm.habit.type].chartPrimaryColor;
 

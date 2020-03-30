@@ -65,3 +65,22 @@ class WeekDateRange {
     return "$fromStr - $toStr";
   }
 }
+
+class DateTimeCompare {
+  DateTime dateTime1;
+  DateTime dateTime2;
+
+  DateTimeCompare(this.dateTime1, this.dateTime2);
+
+  DateTime get min {
+    return this.dateTime1.isAfter(this.dateTime2)
+        ? this.dateTime2
+        : this.dateTime1;
+  }
+
+  DateTime get max {
+    return this.dateTime1.isAfter(this.dateTime2)
+        ? this.dateTime1
+        : this.dateTime2;
+  }
+}
