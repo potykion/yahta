@@ -120,6 +120,7 @@ class _HabitTypePickerState extends State<HabitTypePicker> {
 
           var selected = index == _selectedIndex;
 
+          // todo onSelected as contructor field
           return ChoiceChip(
             label: theme.chipStyle.label,
             selected: selected,
@@ -312,3 +313,44 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
     );
   }
 }
+
+typedef OnTitleChanged = void Function(String newTitle);
+
+class HabitTitleInput extends StatefulWidget {
+  final String initialTitle;
+  final OnTitleChanged onTitleChanged;
+
+  HabitTitleInput(this.initialTitle, this.onTitleChanged);
+
+  @override
+  _HabitTitleInputState createState() => _HabitTitleInputState();
+}
+
+class _HabitTitleInputState extends State<HabitTitleInput> {
+  TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+
+    controller.text = widget.initialTitle;
+    controller.addListener(() {
+      widget.onTitleChanged(controller.text);
+    });
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: "Название",
+        enabledBorder: OutlineInputBorder(),
+        focusedBorder: OutlineInputBorder(),
+      ),
+    );
+  }
+}
+

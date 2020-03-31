@@ -12,19 +12,6 @@ class EditHabitPage extends StatefulWidget {
 }
 
 class _EditHabitPageState extends State<EditHabitPage> {
-  TextEditingController controller = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-
-    var state = Provider.of<HabitState>(context, listen: false);
-    controller.text = state.habitToEdit.habit.title;
-    controller.addListener(() {
-      state.updateHabitToEdit(title: controller.text);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,21 +44,20 @@ class _EditHabitPageState extends State<EditHabitPage> {
       ),
       body: Column(
         children: <Widget>[
-          // todo изолировать
           Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                labelText: "Название",
-                enabledBorder: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(),
-              ),
+            padding: EdgeInsets.all(10.0),
+            child: HabitTitleInput(
+              Provider.of<HabitState>(context, listen: false)
+                  .habitToEdit
+                  .habit
+                  .title,
+              (String newTitle) =>
+                  Provider.of<HabitState>(context, listen: false)
+                      .updateHabitToEdit(title: newTitle),
             ),
           ),
           HabitTypePicker(),
           Flexible(child: WeeklyHabitMarkChart()),
-
         ],
       ),
     );
