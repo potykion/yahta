@@ -316,17 +316,17 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
 
 typedef OnTitleChanged = void Function(String newTitle);
 
-class HabitTitleInput extends StatefulWidget {
-  final String initialTitle;
-  final OnTitleChanged onTitleChanged;
+class OutlinedInput extends StatefulWidget {
+  final String initialText;
+  final OnTitleChanged onTextChanged;
 
-  HabitTitleInput(this.initialTitle, this.onTitleChanged);
+  OutlinedInput(this.initialText, this.onTextChanged);
 
   @override
-  _HabitTitleInputState createState() => _HabitTitleInputState();
+  _OutlinedInputState createState() => _OutlinedInputState();
 }
 
-class _HabitTitleInputState extends State<HabitTitleInput> {
+class _OutlinedInputState extends State<OutlinedInput> {
   TextEditingController controller = TextEditingController();
 
   @override
@@ -334,21 +334,24 @@ class _HabitTitleInputState extends State<HabitTitleInput> {
     super.initState();
 
 
-    controller.text = widget.initialTitle;
+    controller.text = widget.initialText;
     controller.addListener(() {
-      widget.onTitleChanged(controller.text);
+      widget.onTextChanged(controller.text);
     });
   }
 
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: "Название",
-        enabledBorder: OutlineInputBorder(),
-        focusedBorder: OutlineInputBorder(),
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: "Название",
+          enabledBorder: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(),
+        ),
       ),
     );
   }

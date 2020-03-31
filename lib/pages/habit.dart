@@ -1,3 +1,4 @@
+import 'package:yahta/logic/core/context_apis.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yahta/logic/habit/state.dart';
@@ -44,17 +45,9 @@ class _EditHabitPageState extends State<EditHabitPage> {
       ),
       body: Column(
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(10.0),
-            child: HabitTitleInput(
-              Provider.of<HabitState>(context, listen: false)
-                  .habitToEdit
-                  .habit
-                  .title,
-              (String newTitle) =>
-                  Provider.of<HabitState>(context, listen: false)
-                      .updateHabitToEdit(title: newTitle),
-            ),
+          OutlinedInput(
+            context.read<HabitState>().habitToEdit.habit.title,
+            (text) => context.read<HabitState>().updateHabitToEdit(title: text),
           ),
           HabitTypePicker(),
           Flexible(child: WeeklyHabitMarkChart()),
