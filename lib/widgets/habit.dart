@@ -159,6 +159,50 @@ class HabitMarkCounter extends StatelessWidget {
   }
 }
 
+class DayHabitMarkListView extends StatelessWidget {
+  final List<HabitMark> marks;
+
+  DayHabitMarkListView({@required this.marks});
+
+  @override
+  Widget build(BuildContext context) {
+    var markListTiles = marks
+        .map(
+          (mark) => Dismissible(
+            child: ListTile(
+              title: Text(DateFormat.Hms().format(mark.datetime)),
+              trailing: IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () => DatePicker.showTimePicker(
+                  context,
+                  onConfirm: (DateTime newDateTime) async {
+                    await Provider.of<HabitState>(context, listen: false)
+                        .updateHabitMark(mark, datetime: newDateTime);
+                  },
+                  currentTime: mark.datetime,
+                ),
+              ),
+            ),
+            key: Key(mark.id.toString()),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              child: ListTile(
+                trailing: Icon(Icons.delete, color: Colors.red.shade100),
+              ),
+              color: Colors.red.shade500,
+            ),
+            onDismissed: (_) async {
+              await Provider.of<HabitState>(context, listen: false)
+                  .deleteHabitMark(mark);
+            },
+          ),
+        )
+        .toList();
+
+    return ListView(children: markListTiles);
+  }
+}
+
 class WeeklyHabitMarkChart extends StatefulWidget {
   @override
   _WeeklyHabitMarkChartState createState() => _WeeklyHabitMarkChartState();
@@ -229,10 +273,12 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
         ];
 
         if (state.habitMarkStatsDate != null) {
-          var dateMarks = state.habitToEdit.habitMarks.where(
-            (mark) => DayDateTimeRange(state.habitMarkStatsDate)
-                .matchDatetime(mark.datetime),
-          );
+          var dateMarks = state.habitToEdit.habitMarks
+              .where(
+                (mark) => DayDateTimeRange(state.habitMarkStatsDate)
+                    .matchDatetime(mark.datetime),
+              )
+              .toList();
 
           widgets.add(
             Flexible(
@@ -249,55 +295,7 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                             ),
                           ),
                           Flexible(
-                            child: ListView(
-                              children: dateMarks
-                                  .map(
-                                    (mark) => Dismissible(
-                                      child: ListTile(
-                                        title: Text(
-                                          DateFormat.Hms()
-                                              .format(mark.datetime),
-                                        ),
-                                        trailing: IconButton(
-                                          icon: Icon(Icons.edit),
-                                          onPressed: () {
-                                            DatePicker.showTimePicker(
-                                              context,
-                                              onConfirm:
-                                                  // todo refactor this!!!!!!!!!
-                                                  (DateTime newDateTime) async {
-                                                await Provider.of<HabitState>(
-                                                        context,
-                                                        listen: false)
-                                                    .updateHabitMark(mark,
-                                                        datetime: newDateTime);
-                                              },
-                                              currentTime: mark.datetime,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      key: Key(mark.id.toString()),
-                                      direction: DismissDirection.endToStart,
-                                      background: Container(
-                                        child: ListTile(
-                                          trailing: Icon(
-                                            Icons.delete,
-                                            color: Colors.red.shade100,
-                                          ),
-                                        ),
-                                        color: Colors.red.shade500,
-                                      ),
-                                      onDismissed: (_) async {
-                                        await Provider.of<HabitState>(context,
-                                                listen: false)
-                                            .deleteHabitMark(mark);
-                                      },
-                                    ),
-                                  )
-                                  .toList(),
-                            ),
-                          )
+                              child: DayHabitMarkListView(marks: dateMarks))
                         ])
                   : Text(
                       "Нет привычек за ${DayDateTimeRange(state.habitMarkStatsDate).toString()}"),
