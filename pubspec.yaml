@@ -47,6 +47,10 @@ dependencies:
   # дейттайм пикер
   flutter_datetime_picker: ^1.3.5
 
+  # кортежики
+  tuple: ^1.0.3
+
+
 
 dev_dependencies:
   flutter_test:

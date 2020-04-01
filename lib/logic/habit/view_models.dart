@@ -14,31 +14,7 @@ class HabitViewModel {
 
   HabitViewModel(this.habit, this.habitMarks);
 
-  DateTime get minChartDateTime {
-    if (this.habitMarks.length == 0) {
-      return this.habit.createdDate;
-    }
 
-    return DateTimeCompare(
-      this.habit.createdDate,
-      (this.habitMarks..sort((m1, m2) => m1.datetime.compareTo(m2.datetime)))
-          .first
-          .datetime,
-    ).min;
-  }
-
-  DateTime get maxChartDateTime {
-    if (this.habitMarks.length == 0) {
-      return DateTime.now();
-    }
-
-    return DateTimeCompare(
-      DateTime.now(),
-      (this.habitMarks..sort((m1, m2) => m1.datetime.compareTo(m2.datetime)))
-          .last
-          .datetime,
-    ).max;
-  }
 }
 
 @freezed

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/view_models.dart';
+import 'package:yahta/styles.dart';
 
 import 'db.dart';
 
@@ -12,16 +13,72 @@ class EditHabitState extends ChangeNotifier {
   //   Может быть отредактирован: удаление и редактирование отетки за день
   List<HabitMark> habitMarks;
 
+  WeekDateRange selectedDateWeekRange = WeekDateRange(DateTime.now());
+  DateTime selectedDate;
+
   HabitRepo _habitRepo;
 
   EditHabitState(this._habitRepo);
+
+  HabitTypeTheme get typeTheme => HabitTypeThemeMap[habitToEdit.type];
+
+  DateTime get minChartDateTime {
+    if (this.habitMarks.length == 0) {
+      return habitToEdit.createdDate;
+    }
+
+    return DateTimeCompare(
+      this.habitToEdit.createdDate,
+      (this.habitMarks..sort((m1, m2) => m1.datetime.compareTo(m2.datetime)))
+          .first
+          .datetime,
+    ).min;
+  }
+
+  DateTime get maxChartDateTime {
+    if (this.habitMarks.length == 0) {
+      return DateTime.now();
+    }
+
+    return DateTimeCompare(
+      DateTime.now(),
+      (this.habitMarks..sort((m1, m2) => m1.datetime.compareTo(m2.datetime)))
+          .last
+          .datetime,
+    ).max;
+  }
+
+  HabitMarkSeries get frequencyChartSeries {
+    return HabitMarkSeries(
+      habitMarks,
+      selectedDateWeekRange,
+      minChartDateTime,
+      maxChartDateTime,
+    );
+  }
+
+  List<HabitMark> get dateMarks {
+    print(selectedDate);
+
+    if (selectedDate == null) {
+      return [];
+    }
+
+    return habitMarks
+        .where(
+          (mark) => DayDateTimeRange(selectedDate).matchDatetime(mark.datetime),
+        )
+        .toList();
+  }
 
   loadHabitToEdit(int habitId) async {
     this.habitToEdit = await _habitRepo.getHabitById(habitId);
     notifyListeners();
   }
 
-  loadWeeklyHabitMarks(WeekDateRange weekDateRange) async {
+  loadWeeklyHabitMarks([WeekDateRange weekDateRange]) async {
+    weekDateRange = weekDateRange ?? selectedDateWeekRange;
+
     assert(this.habitToEdit != null);
     this.habitMarks = await _habitRepo.listHabitMarksBetween(
       weekDateRange.fromDateTime,
@@ -40,6 +97,22 @@ class EditHabitState extends ChangeNotifier {
   deleteHabitToEdit() async {
     await _habitRepo.deleteHabit(habitToEdit);
     habitToEdit = null;
+    notifyListeners();
+  }
+
+  deleteHabitMark(HabitMark mark) async {
+    await _habitRepo.deleteHabitMark(mark);
+    habitMarks.remove(mark);
+    notifyListeners();
+  }
+
+  void setSelectedWeekRange(WeekDateRange weekDateRange) {
+    selectedDateWeekRange = weekDateRange;
+    notifyListeners();
+  }
+
+  void setSelectedDate(DateTime dateTime) {
+    selectedDate = dateTime;
     notifyListeners();
   }
 }
@@ -132,33 +205,12 @@ class HabitState extends ChangeNotifier {
     notifyListeners();
   }
 
-  updateHabitToEdit({String title, HabitType habitType}) async {
-    habitToEdit.habit =
-        habitToEdit.habit.copyWith(title: title, type: habitType);
-    await habitRepo.updateHabit(habitToEdit.habit);
-    notifyListeners();
-  }
-
-  deleteHabitToEdit() async {
-    await habitRepo.deleteHabit(habitToEdit.habit);
-
-    habitVMs.remove(habitToEdit);
-    notifyListeners();
-  }
-
   loadWeeklyHabits(WeekDateRange weekDateRange) async {
     habitToEdit.habitMarks = await habitRepo.listHabitMarksBetween(
       weekDateRange.fromDateTime,
       weekDateRange.toDateTime,
       habitToEdit.habit.id,
     );
-    notifyListeners();
-  }
-
-  deleteHabitMark(HabitMark mark) async {
-    await habitRepo.deleteHabitMark(mark);
-
-    habitToEdit.habitMarks.remove(mark);
     notifyListeners();
   }
 

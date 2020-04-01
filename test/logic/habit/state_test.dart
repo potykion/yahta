@@ -21,25 +21,6 @@ void main() {
     await _db.close();
   });
 
-  group("Тестим стейт", () {
-    test("Тестим редактирование привычки", () async {
-      var habitId = await repo.insertHabit("title");
-      var habit = await repo.getHabitById(habitId);
-
-      await repo.insertHabitMark(habitId);
-      await repo.insertHabitMark(habitId);
-      var habitMarks = await repo.listHabitMarks(habitId);
-
-      var vm = HabitViewModel(habit, habitMarks);
-      await habitState.setHabitToEdit(vm);
-
-      await habitState.updateHabitToEdit(title: "new title");
-
-      habit = await repo.getHabitById(habitId);
-      expect(habit.title, "new title");
-    });
-  });
-
   group("Тестим стейт редактируемой привычки", () {
     test("Тестим загрузку привычки", () async {
       var habitId = await repo.insertHabit("title");
@@ -78,6 +59,19 @@ void main() {
 
       expect(editHabitState.habitToEdit, isNull);
       expect((await repo.getHabitById(habitId)), isNull);
+    });
+
+    test("Удаление отметки привычки", () async {
+      var habitId = await repo.insertHabit("title");
+      var habitMarkId = await repo.insertHabitMark(habitId, DateTime(2020, 3, 30));
+      await editHabitState.loadHabitToEdit(habitId);
+      await editHabitState.loadWeeklyHabitMarks(WeekDateRange(DateTime(2020, 3, 30)));
+
+      var mark = await repo.getHabitMarkById(habitMarkId);
+      await editHabitState.deleteHabitMark(mark);
+
+      expect(editHabitState.habitMarks.length, 0);
+      expect((await repo.getHabitMarkById(habitMarkId)), isNull);
     });
   });
 }

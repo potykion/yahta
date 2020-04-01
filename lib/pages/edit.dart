@@ -1,9 +1,11 @@
+import 'package:tuple/tuple.dart';
 import 'package:yahta/logic/core/context_apis.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/db.dart';
 import 'package:yahta/logic/habit/state.dart';
+import 'package:yahta/logic/habit/view_models.dart';
 import 'package:yahta/styles.dart';
 import 'package:yahta/widgets/core.dart';
 import 'package:yahta/widgets/edit.dart';
@@ -67,6 +69,7 @@ class _EditHabitPageState extends State<EditHabitPage> {
       body: context.read<EditHabitState>().habitToEdit == null
           ? Center(child: Text("Ща"))
           : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 OutlinedInput(
                   context.read<EditHabitState>().habitToEdit.title,
@@ -80,7 +83,58 @@ class _EditHabitPageState extends State<EditHabitPage> {
                       .read<EditHabitState>()
                       .updateHabit(habitType: habitType),
                 ),
-                Flexible(child: WeeklyHabitMarkChart()),
+                Padding(
+                  padding: EdgeInsets.only(top: 8, left: 16),
+                  child: Text(
+                    context
+                        .read<EditHabitState>()
+                        .selectedDateWeekRange
+                        .toString(),
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ),
+                Flexible(
+                    child: WeekSwiper(
+                  builder: (context) => Selector<
+                      EditHabitState,
+                      Tuple3<HabitMarkSeries, HabitTypeTheme,
+                          OnFrequencySelect>>(
+                    selector: (_, EditHabitState state) => Tuple3(
+                      state.frequencyChartSeries,
+                      state.typeTheme,
+                      (freq) => state.setSelectedDate(freq.date),
+                    ),
+                    // todo FrequencyChart ререндерится оч часто
+                    //  мб из-за context.read<EditHabitState>().habitToEdit == null
+
+                    builder: (context, tuple, __) {
+                      print("rerendered");
+
+                      return FrequencyChart(
+                        series: tuple.item1,
+                        color: tuple.item2.primaryColor,
+                        onFrequencySelect: tuple.item3,
+                      );
+                    },
+                  ),
+                  onWeekChange: (WeekDateRange weekDateRange) async {
+                    var state = context.read<EditHabitState>();
+
+                    state.setSelectedWeekRange(weekDateRange);
+                    state.setSelectedDate(null);
+                    await state.loadWeeklyHabitMarks();
+                  },
+                )),
+                Flexible(
+                  child: Selector<EditHabitState, DateTime>(
+                    selector: (_, state) => state.selectedDate,
+                    builder: (_, date, __) => date == null
+                        ? Container()
+                        : DayHabitMarkListView(
+                            marks: context.read<EditHabitState>().dateMarks,
+                          ),
+                  ),
+                )
               ],
             ),
     );

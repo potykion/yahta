@@ -8,6 +8,7 @@ import 'package:yahta/logic/habit/state.dart';
 import 'package:yahta/logic/habit/view_models.dart';
 import 'package:yahta/styles.dart';
 import 'package:yahta/widgets/core.dart';
+import 'package:yahta/logic/core/context_apis.dart';
 
 typedef OnHabitTypeChange = void Function(HabitType habitType);
 
@@ -94,121 +95,23 @@ class DayHabitMarkListView extends StatelessWidget {
               color: Colors.red.shade500,
             ),
             onDismissed: (_) async {
-              await Provider.of<HabitState>(context, listen: false)
-                  .deleteHabitMark(mark);
+              await context.read<EditHabitState>().deleteHabitMark(mark);
             },
           ),
         )
         .toList();
 
+    //    todo
+    //    Padding(
+    //      padding: EdgeInsets.only(top: 8, left: 16),
+    //      child: Text(
+    //        DateFormat.MMMMEEEEd()
+    //            .format(state.habitMarkStatsDate),
+    //        style: Theme.of(context).textTheme.title,
+    //      ),
+    //    )
+
     return ListView(children: markListTiles);
   }
 }
 
-class WeeklyHabitMarkChart extends StatefulWidget {
-  @override
-  _WeeklyHabitMarkChartState createState() => _WeeklyHabitMarkChartState();
-}
-
-class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
-  var previousIndex = 0;
-  WeekDateRange currentDateWeekRange;
-
-  @override
-  void initState() {
-    super.initState();
-
-    currentDateWeekRange = WeekDateRange(DateTime.now());
-  }
-
-  // todo rewrite this
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<HabitState>(
-      builder: (BuildContext context, HabitState state, Widget child) {
-        HabitViewModel vm = state.habitToEdit;
-        HabitMarkSeries series = HabitMarkSeries(
-          vm.habitMarks,
-          currentDateWeekRange,
-          vm.minChartDateTime,
-          vm.maxChartDateTime,
-        );
-        var color = HabitTypeThemeMap[vm.habit.type].primaryColor;
-
-        List<Widget> widgets = [
-          Flexible(
-              child: WeekSwiper(
-            builder: (context) => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 8, left: 16),
-                  child: Text(
-                    currentDateWeekRange.toString(),
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                ),
-                Flexible(
-                  child: FrequencyChart(
-                      series: series,
-                      color: color,
-                      onFrequencySelect: (selectedFreq) {
-                        var state =
-                            Provider.of<HabitState>(context, listen: false);
-                        state.setHabitMarkStatsDate(selectedFreq.date);
-                      }),
-                ),
-              ],
-            ),
-            onWeekChange: (WeekDateRange weekDateRange) async {
-              setState(() {
-                currentDateWeekRange = weekDateRange;
-              });
-
-              var state = Provider.of<HabitState>(context, listen: false);
-              await state.loadWeeklyHabits(currentDateWeekRange);
-              state.setHabitMarkStatsDate(null);
-            },
-          )),
-        ];
-
-        if (state.habitMarkStatsDate != null) {
-          var dateMarks = state.habitToEdit.habitMarks
-              .where(
-                (mark) => DayDateTimeRange(state.habitMarkStatsDate)
-                    .matchDatetime(mark.datetime),
-              )
-              .toList();
-
-          widgets.add(
-            Flexible(
-              child: dateMarks.length > 0
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(top: 8, left: 16),
-                            child: Text(
-                              DateFormat.MMMMEEEEd()
-                                  .format(state.habitMarkStatsDate),
-                              style: Theme.of(context).textTheme.title,
-                            ),
-                          ),
-                          Flexible(
-                              child: DayHabitMarkListView(marks: dateMarks))
-                        ])
-                  : Text(
-                      "Нет привычек за ${DayDateTimeRange(state.habitMarkStatsDate).toString()}"),
-            ),
-          );
-        } else {
-          widgets.add(Flexible(
-            child: Container(),
-          ));
-        }
-
-        return Column(children: widgets);
-      },
-    );
-  }
-}
