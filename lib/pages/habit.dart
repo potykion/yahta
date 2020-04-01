@@ -2,6 +2,7 @@ import 'package:yahta/logic/core/context_apis.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yahta/logic/core/date.dart';
+import 'package:yahta/logic/habit/db.dart';
 import 'package:yahta/logic/habit/state.dart';
 import 'package:yahta/styles.dart';
 import 'package:yahta/widgets/habit.dart';
@@ -22,10 +23,13 @@ class _EditHabitPageState extends State<EditHabitPage> {
   void initState() {
     super.initState();
 
+    context.read<EditHabitState>().habitToEdit = null;
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      var state = Provider.of<EditHabitState>(context, listen: false);
-      await state.loadHabitToEdit(widget.habitId);
-      await state.loadWeeklyHabitMarks(WeekDateRange(DateTime.now()));
+      await context.read<EditHabitState>().loadHabitToEdit(widget.habitId);
+      await context
+          .read<EditHabitState>()
+          .loadWeeklyHabitMarks(WeekDateRange(DateTime.now()));
     });
   }
 
@@ -55,24 +59,29 @@ class _EditHabitPageState extends State<EditHabitPage> {
         ],
         title: Text("Инфа о привычке"),
         backgroundColor: HabitTypeThemeMap[
-                Provider.of<EditHabitState>(context).habitToEdit.type]
+                Provider.of<EditHabitState>(context).habitToEdit?.type ??
+                    HabitType.positive]
             .primaryColor,
       ),
-      body: Column(
-        children: <Widget>[
-          OutlinedInput(
-            context.read<EditHabitState>().habitToEdit.title,
-            (text) => context.read<EditHabitState>().updateHabit(title: text),
-          ),
-          HabitTypePicker(
-            initialHabitType: context.read<EditHabitState>().habitToEdit.type,
-            onHabitTypeChange: (habitType) => context
-                .read<EditHabitState>()
-                .updateHabit(habitType: habitType),
-          ),
-          Flexible(child: WeeklyHabitMarkChart()),
-        ],
-      ),
+      body: context.read<EditHabitState>().habitToEdit == null
+          ? Center(child: Text("Ща"))
+          : Column(
+              children: <Widget>[
+                OutlinedInput(
+                  context.read<EditHabitState>().habitToEdit.title,
+                  (text) =>
+                      context.read<EditHabitState>().updateHabit(title: text),
+                ),
+                HabitTypePicker(
+                  initialHabitType:
+                      context.read<EditHabitState>().habitToEdit.type,
+                  onHabitTypeChange: (habitType) => context
+                      .read<EditHabitState>()
+                      .updateHabit(habitType: habitType),
+                ),
+                Flexible(child: WeeklyHabitMarkChart()),
+              ],
+            ),
     );
   }
 }
