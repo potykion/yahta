@@ -4,6 +4,46 @@ import 'package:yahta/logic/habit/view_models.dart';
 
 import 'db.dart';
 
+class EditHabitState extends ChangeNotifier {
+  // Редактируемая привычка; редактируются обычно название, тип
+  Habit habitToEdit;
+
+  // Список отметок привычки - используется для частотного графика
+  //   Может быть отредактирован: удаление и редактирование отетки за день
+  List<HabitMark> habitMarks;
+
+  HabitRepo _habitRepo;
+
+  EditHabitState(this._habitRepo);
+
+  loadHabitToEdit(int habitId) async {
+    this.habitToEdit = await _habitRepo.getHabitById(habitId);
+    notifyListeners();
+  }
+
+  loadWeeklyHabitMarks(WeekDateRange weekDateRange) async {
+    assert(this.habitToEdit != null);
+    this.habitMarks = await _habitRepo.listHabitMarksBetween(
+      weekDateRange.fromDateTime,
+      weekDateRange.toDateTime,
+      this.habitToEdit.id,
+    );
+    notifyListeners();
+  }
+
+  updateHabit({String title, HabitType habitType}) async {
+    habitToEdit = habitToEdit.copyWith(title: title, type: habitType);
+    await _habitRepo.updateHabit(habitToEdit);
+    notifyListeners();
+  }
+
+  deleteHabitToEdit() async {
+    await _habitRepo.deleteHabit(habitToEdit);
+    habitToEdit = null;
+    notifyListeners();
+  }
+}
+
 // todo split to ListHabitState & EditHabitState
 class HabitState extends ChangeNotifier {
   /// Флаг загрузки списка привычек

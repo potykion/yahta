@@ -1,18 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:moor_ffi/moor_ffi.dart';
+import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/db.dart';
 import 'package:yahta/logic/habit/state.dart';
 import 'package:yahta/logic/habit/view_models.dart';
 
 void main() {
   Database _db;
-  HabitRepo _repo;
+  HabitRepo repo;
   HabitState habitState;
+  EditHabitState editHabitState;
 
   setUp(() {
     _db = Database(VmDatabase.memory());
-    _repo = HabitRepo(_db);
-    habitState = HabitState(_repo);
+    repo = HabitRepo(_db);
+    habitState = HabitState(repo);
+    editHabitState = EditHabitState(repo);
   });
   tearDown(() async {
     await _db.close();
@@ -20,20 +23,61 @@ void main() {
 
   group("Тестим стейт", () {
     test("Тестим редактирование привычки", () async {
-      var habitId = await _repo.insertHabit("title");
-      var habit = await _repo.getHabitById(habitId);
+      var habitId = await repo.insertHabit("title");
+      var habit = await repo.getHabitById(habitId);
 
-      await _repo.insertHabitMark(habitId);
-      await _repo.insertHabitMark(habitId);
-      var habitMarks = await _repo.listHabitMarks(habitId);
+      await repo.insertHabitMark(habitId);
+      await repo.insertHabitMark(habitId);
+      var habitMarks = await repo.listHabitMarks(habitId);
 
       var vm = HabitViewModel(habit, habitMarks);
       await habitState.setHabitToEdit(vm);
 
       await habitState.updateHabitToEdit(title: "new title");
 
-      habit = await _repo.getHabitById(habitId);
+      habit = await repo.getHabitById(habitId);
       expect(habit.title, "new title");
+    });
+  });
+
+  group("Тестим стейт редактируемой привычки", () {
+    test("Тестим загрузку привычки", () async {
+      var habitId = await repo.insertHabit("title");
+
+      await editHabitState.loadHabitToEdit(habitId);
+
+      expect(editHabitState.habitToEdit.title, "title");
+    });
+
+    test("Тестим загрузку отметок привычки", () async {
+      var habitId = await repo.insertHabit("title");
+      await repo.insertHabitMark(habitId, DateTime(2020, 3, 30));
+      await repo.insertHabitMark(habitId, DateTime(2020, 3, 31));
+
+      await editHabitState.loadHabitToEdit(habitId);
+      await editHabitState.loadWeeklyHabitMarks(WeekDateRange(DateTime(2020, 3, 30)));
+
+      expect(editHabitState.habitMarks.length, 2);
+    });
+
+    test("Тестим обновление привычки", () async {
+      var habitId = await repo.insertHabit("title");
+
+      await editHabitState.loadHabitToEdit(habitId);
+      await editHabitState.updateHabit(title: "new title");
+
+      expect(editHabitState.habitToEdit.title, "new title");
+      expect((await repo.getHabitById(habitId)).title, "new title");
+    });
+
+    test("Удаление привычки", () async {
+      var habitId = await repo.insertHabit("title");
+
+      await editHabitState.loadHabitToEdit(habitId);
+      await editHabitState.deleteHabitToEdit();
+
+      expect(editHabitState.habitToEdit, isNull);
+      expect((await repo.getHabitById(habitId)), isNull);
     });
   });
 }

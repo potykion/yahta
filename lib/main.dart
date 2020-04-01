@@ -27,7 +27,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<HabitState>(
           create: (context) =>
               HabitState(Provider.of<HabitRepo>(context, listen: false)),
-        )
+        ),
+        ChangeNotifierProvider<EditHabitState>(
+          create: (context) =>
+              EditHabitState(Provider.of<HabitRepo>(context, listen: false)),
+        ),
       ],
       child: new MaterialApp(
         title: 'Flutter Demo',

@@ -126,16 +126,16 @@ class HabitRepo {
 
   Future<Habit> getHabitById(int habitId) => db.getHabitById(habitId);
 
-  updateHabit(Habit updatedHabit) async => db.updateHabit(updatedHabit);
+  Future updateHabit(Habit updatedHabit) async => db.updateHabit(updatedHabit);
 
-  deleteHabit(Habit habit) => db.deleteHabitById(habit.id);
+  Future deleteHabit(Habit habit) => db.deleteHabitById(habit.id);
 
-  listHabitMarks(int habitId) => db.listHabitMarks(habitId);
+  Future<List<HabitMark>> listHabitMarks(int habitId) => db.listHabitMarks(habitId);
 
-  listHabitMarksBetween(DateTime from, DateTime to, [habitId]) =>
+  Future<List<HabitMark>> listHabitMarksBetween(DateTime from, DateTime to, [habitId]) =>
       db.listHabitMarksBetween(from, to, habitId);
 
-  deleteHabitMark(HabitMark mark) => db.deleteHabitMarkById(mark.id);
+  Future deleteHabitMark(HabitMark mark) => db.deleteHabitMarkById(mark.id);
 
-  updateHabitMark(HabitMark mark) => db.updateHabitMark(mark);
+  Future updateHabitMark(HabitMark mark) => db.updateHabitMark(mark);
 }

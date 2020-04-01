@@ -1,6 +1,7 @@
 import 'package:yahta/logic/core/context_apis.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/state.dart';
 import 'package:yahta/styles.dart';
 import 'package:yahta/widgets/habit.dart';
@@ -8,11 +9,26 @@ import 'package:yahta/widgets/habit.dart';
 enum HabitMenuAction { delete }
 
 class EditHabitPage extends StatefulWidget {
+  final int habitId;
+
+  EditHabitPage(this.habitId);
+
   @override
   _EditHabitPageState createState() => _EditHabitPageState();
 }
 
 class _EditHabitPageState extends State<EditHabitPage> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      var state = Provider.of<EditHabitState>(context, listen: false);
+      await state.loadHabitToEdit(widget.habitId);
+      await state.loadWeeklyHabitMarks(WeekDateRange(DateTime.now()));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,10 +45,9 @@ class _EditHabitPageState extends State<EditHabitPage> {
                 child: Text('Удалить'),
               )
             ],
-            onSelected: (HabitMenuAction action) {
+            onSelected: (HabitMenuAction action) async {
               if (action == HabitMenuAction.delete) {
-                Provider.of<HabitState>(context, listen: false)
-                    .deleteHabitToEdit();
+                await context.read<EditHabitState>().deleteHabitToEdit();
                 Navigator.pop(context);
               }
             },
@@ -40,16 +55,21 @@ class _EditHabitPageState extends State<EditHabitPage> {
         ],
         title: Text("Инфа о привычке"),
         backgroundColor: HabitTypeThemeMap[
-                Provider.of<HabitState>(context).habitToEdit.habit.type]
+                Provider.of<EditHabitState>(context).habitToEdit.type]
             .primaryColor,
       ),
       body: Column(
         children: <Widget>[
           OutlinedInput(
-            context.read<HabitState>().habitToEdit.habit.title,
-            (text) => context.read<HabitState>().updateHabitToEdit(title: text),
+            context.read<EditHabitState>().habitToEdit.title,
+            (text) => context.read<EditHabitState>().updateHabit(title: text),
           ),
-          HabitTypePicker(),
+          HabitTypePicker(
+            initialHabitType: context.read<EditHabitState>().habitToEdit.type,
+            onHabitTypeChange: (habitType) => context
+                .read<EditHabitState>()
+                .updateHabit(habitType: habitType),
+          ),
           Flexible(child: WeeklyHabitMarkChart()),
         ],
       ),

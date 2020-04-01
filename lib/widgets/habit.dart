@@ -75,13 +75,12 @@ class HabitListView extends StatelessWidget {
               leading: HabitMarkCounter(vm),
               title: Text(vm.habit.title),
               onTap: () async {
-                var state = Provider.of<HabitState>(context, listen: false);
-                await state.setHabitToEdit(vm);
-
                 await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => EditHabitPage()),
+                  MaterialPageRoute(builder: (_) => EditHabitPage(vm.habit.id)),
                 );
+
+                var state = Provider.of<HabitState>(context, listen: false);
                 await state.loadDateHabits();
               },
               onLongPress: () async {
@@ -95,7 +94,17 @@ class HabitListView extends StatelessWidget {
   }
 }
 
+typedef OnHabitTypeChange = void Function(HabitType habitType);
+
 class HabitTypePicker extends StatefulWidget {
+  final HabitType initialHabitType;
+  final OnHabitTypeChange onHabitTypeChange;
+
+  HabitTypePicker({
+    @required this.initialHabitType,
+    @required this.onHabitTypeChange,
+  });
+
   @override
   _HabitTypePickerState createState() => _HabitTypePickerState();
 }
@@ -107,8 +116,7 @@ class _HabitTypePickerState extends State<HabitTypePicker> {
   void initState() {
     super.initState();
 
-    var state = Provider.of<HabitState>(context, listen: false);
-    _selectedIndex = state.habitToEdit.habit.type.index;
+    _selectedIndex = widget.initialHabitType.index;
   }
 
   @override
@@ -120,7 +128,6 @@ class _HabitTypePickerState extends State<HabitTypePicker> {
 
           var selected = index == _selectedIndex;
 
-          // todo onSelected as contructor field
           return ChoiceChip(
             label: theme.chipStyle.label,
             selected: selected,
@@ -132,8 +139,7 @@ class _HabitTypePickerState extends State<HabitTypePicker> {
                 _selectedIndex = index;
               });
 
-              var state = Provider.of<HabitState>(context, listen: false);
-              await state.updateHabitToEdit(habitType: habitType);
+              widget.onHabitTypeChange(habitType);
             },
           );
         }),
@@ -220,6 +226,7 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
     currentDateWeekRange = WeekDateRange(DateTime.now());
   }
 
+  // todo rewrite this
   @override
   Widget build(BuildContext context) {
     return Consumer<HabitState>(
@@ -247,17 +254,14 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
                   ),
                 ),
                 Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: FrequencyChart(
-                        series: series,
-                        color: color,
-                        onFrequencySelect: (selectedFreq) {
-                          var state =
-                              Provider.of<HabitState>(context, listen: false);
-                          state.setHabitMarkStatsDate(selectedFreq.date);
-                        }),
-                  ),
+                  child: FrequencyChart(
+                      series: series,
+                      color: color,
+                      onFrequencySelect: (selectedFreq) {
+                        var state =
+                            Provider.of<HabitState>(context, listen: false);
+                        state.setHabitMarkStatsDate(selectedFreq.date);
+                      }),
                 ),
               ],
             ),
@@ -333,13 +337,11 @@ class _OutlinedInputState extends State<OutlinedInput> {
   void initState() {
     super.initState();
 
-
     controller.text = widget.initialText;
     controller.addListener(() {
       widget.onTextChanged(controller.text);
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -356,4 +358,3 @@ class _OutlinedInputState extends State<OutlinedInput> {
     );
   }
 }
-
