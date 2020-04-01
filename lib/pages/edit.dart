@@ -5,7 +5,8 @@ import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/db.dart';
 import 'package:yahta/logic/habit/state.dart';
 import 'package:yahta/styles.dart';
-import 'package:yahta/widgets/habit.dart';
+import 'package:yahta/widgets/core.dart';
+import 'package:yahta/widgets/edit.dart';
 
 enum HabitMenuAction { delete }
 

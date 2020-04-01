@@ -1,98 +1,13 @@
-import 'dart:math';
-
-import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:flutter/cupertino.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:yahta/logic/core/date.dart';
-import 'package:yahta/logic/core/swipe.dart';
 import 'package:yahta/logic/habit/db.dart';
 import 'package:yahta/logic/habit/state.dart';
 import 'package:yahta/logic/habit/view_models.dart';
-import 'package:yahta/pages/habit.dart';
 import 'package:yahta/styles.dart';
-import 'package:yahta/utils.dart';
 import 'package:yahta/widgets/core.dart';
-
-class HabitInput extends StatefulWidget {
-  @override
-  _HabitInputState createState() => _HabitInputState();
-}
-
-class _HabitInputState extends State<HabitInput> {
-  TextEditingController controller = TextEditingController();
-  bool canAdd = false;
-
-  @override
-  void initState() {
-    super.initState();
-    controller
-        .addListener(() => setState(() => canAdd = controller.text.length > 0));
-  }
-
-  @override
-  Widget build(BuildContext context) => TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          hintText: "Заведи привычку",
-          suffixIcon: IconButton(
-            icon: Icon(Icons.add),
-            onPressed: canAdd
-                ? () async {
-                    var state = Provider.of<HabitState>(context, listen: false);
-                    await state.createHabit(controller.text);
-
-                    controller.text = "";
-                    removeFocus(context);
-                  }
-                : null,
-          ),
-          enabledBorder: OutlineInputBorder(),
-          focusedBorder: OutlineInputBorder(),
-        ),
-      );
-}
-
-class HabitListView extends StatelessWidget {
-  final List<HabitViewModel> habits;
-
-  HabitListView(this.habits);
-
-  @override
-  Widget build(BuildContext context) {
-    if (habits.length == 0) {
-      return Center(child: Text("Привычек пока нет"));
-    }
-
-    return ListView(
-      children: habits
-          .map(
-            (vm) => ListTile(
-              leading: HabitMarkCounter(vm),
-              title: Text(vm.habit.title),
-              onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => EditHabitPage(vm.habit.id)),
-                );
-
-                var state = Provider.of<HabitState>(context, listen: false);
-                await state.loadDateHabits();
-              },
-              onLongPress: () async {
-                var state = Provider.of<HabitState>(context, listen: false);
-                await state.createHabitMark(vm.habit.id);
-              },
-            ),
-          )
-          .toList(),
-    );
-  }
-}
 
 typedef OnHabitTypeChange = void Function(HabitType habitType);
 
@@ -144,26 +59,6 @@ class _HabitTypePickerState extends State<HabitTypePicker> {
           );
         }),
       );
-}
-
-class HabitMarkCounter extends StatelessWidget {
-  final HabitViewModel vm;
-
-  HabitMarkCounter(this.vm);
-
-  @override
-  Widget build(BuildContext context) {
-    var theme = HabitTypeThemeMap[vm.habit.type];
-    return CircleAvatar(
-      child: Text(
-        vm.habitMarks.length.toString(),
-        style: theme.counterStyle.textStyle,
-      ),
-      backgroundColor: vm.habitMarks.length == 0
-          ? theme.counterStyle.zeroBackgroundColor
-          : theme.counterStyle.nonZeroBackgroundColor,
-    );
-  }
 }
 
 class DayHabitMarkListView extends StatelessWidget {
@@ -314,47 +209,6 @@ class _WeeklyHabitMarkChartState extends State<WeeklyHabitMarkChart> {
 
         return Column(children: widgets);
       },
-    );
-  }
-}
-
-typedef OnTitleChanged = void Function(String newTitle);
-
-class OutlinedInput extends StatefulWidget {
-  final String initialText;
-  final OnTitleChanged onTextChanged;
-
-  OutlinedInput(this.initialText, this.onTextChanged);
-
-  @override
-  _OutlinedInputState createState() => _OutlinedInputState();
-}
-
-class _OutlinedInputState extends State<OutlinedInput> {
-  TextEditingController controller = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-
-    controller.text = widget.initialText;
-    controller.addListener(() {
-      widget.onTextChanged(controller.text);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: "Название",
-          enabledBorder: OutlineInputBorder(),
-          focusedBorder: OutlineInputBorder(),
-        ),
-      ),
     );
   }
 }

@@ -144,3 +144,44 @@ class FrequencyChart extends StatelessWidget {
     );
   }
 }
+
+typedef OnTitleChanged = void Function(String newTitle);
+
+class OutlinedInput extends StatefulWidget {
+  final String initialText;
+  final OnTitleChanged onTextChanged;
+
+  OutlinedInput(this.initialText, this.onTextChanged);
+
+  @override
+  _OutlinedInputState createState() => _OutlinedInputState();
+}
+
+class _OutlinedInputState extends State<OutlinedInput> {
+  TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller.text = widget.initialText;
+    controller.addListener(() {
+      widget.onTextChanged(controller.text);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: "Название",
+          enabledBorder: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+}

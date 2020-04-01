@@ -1,5 +1,3 @@
-import 'package:charts_flutter/flutter.dart' as charts;
-
 import 'package:flutter/material.dart';
 
 import 'logic/habit/db.dart';
@@ -33,17 +31,15 @@ class HabitTypeTheme {
     this.chipStyle.textColor = this.chipStyle.textColor ?? this.primaryColor;
     this.chipStyle.background = this.chipStyle.background ?? this.primaryColor;
   }
-
 }
 
 Map<HabitType, HabitTypeTheme> HabitTypeThemeMap = {
   HabitType.positive: HabitTypeTheme(
     primaryColor: Colors.green.shade500,
     chipStyle: HabitTypeChipStyle(
-      label: Text("Полезная"),
-      background: Colors.green.shade100,
-      textColor: Colors.green.shade700
-    ),
+        label: Text("Полезная"),
+        background: Colors.green.shade100,
+        textColor: Colors.green.shade700),
     counterStyle: HabitTypeCounterStyle(
       zeroBackgroundColor: Colors.grey.shade400,
       nonZeroBackgroundColor: Colors.green.shade700,
@@ -72,3 +68,7 @@ Map<HabitType, HabitTypeTheme> HabitTypeThemeMap = {
     ),
   ),
 };
+
+ThemeData AppTheme = ThemeData(
+  primarySwatch: Colors.green,
+);
