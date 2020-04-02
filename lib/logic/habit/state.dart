@@ -136,7 +136,7 @@ class ListHabitState extends ChangeNotifier {
   var currentDate = DateTime.now();
 
   /// Список привычек и отметок за день
-  List<HabitViewModel> habitVMs = [];
+  List<HabitListViewModel> habitVMs = [];
 
   /// Абстракция над бд
   HabitRepo habitRepo;
@@ -158,7 +158,7 @@ class ListHabitState extends ChangeNotifier {
 
     habitVMs = habits
         .map(
-          (habit) => HabitViewModel(
+          (habit) => HabitListViewModel(
             habit,
             habitMarks.where((mark) => mark.habitId == habit.id).toList(),
           ),
@@ -183,7 +183,7 @@ class ListHabitState extends ChangeNotifier {
     var habitId = await habitRepo.insertHabit(title);
 
     var habit = await habitRepo.getHabitById(habitId);
-    habitVMs.add(HabitViewModel(habit, []));
+    habitVMs.add(HabitListViewModel(habit, []));
 
     notifyListeners();
   }

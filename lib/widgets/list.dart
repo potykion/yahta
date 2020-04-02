@@ -7,7 +7,7 @@ import 'package:yahta/styles.dart';
 import 'package:yahta/logic/core/context_apis.dart';
 
 class HabitListView extends StatelessWidget {
-  final List<HabitViewModel> habits;
+  final List<HabitListViewModel> habits;
 
   HabitListView(this.habits);
 
@@ -44,7 +44,7 @@ class HabitListView extends StatelessWidget {
 }
 
 class HabitMarkCounter extends StatelessWidget {
-  final HabitViewModel vm;
+  final HabitListViewModel vm;
 
   HabitMarkCounter(this.vm);
 

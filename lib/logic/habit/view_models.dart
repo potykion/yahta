@@ -7,14 +7,11 @@ import 'db.dart';
 
 part 'view_models.freezed.dart';
 
-// todo: HabitListViewModel, HabitEditViewModel (with chart getters)
-class HabitViewModel {
+class HabitListViewModel {
   Habit habit;
   List<HabitMark> habitMarks;
 
-  HabitViewModel(this.habit, this.habitMarks);
-
-
+  HabitListViewModel(this.habit, this.habitMarks);
 }
 
 @freezed

@@ -183,3 +183,30 @@ class _OutlinedInputState extends State<OutlinedInput> {
     );
   }
 }
+
+class GoBackButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () => Navigator.pop(context),
+      icon: Icon(Icons.arrow_back),
+    );
+  }
+}
+
+class TitleText extends StatelessWidget {
+  final String text;
+
+  TitleText(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(top: 8, left: 16),
+      child: Text(
+        this.text,
+        style: Theme.of(context).textTheme.title,
+      ),
+    );
+  }
+}
