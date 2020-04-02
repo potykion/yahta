@@ -105,8 +105,8 @@ class _EditHabitPageState extends State<EditHabitPage> {
                       (freq) => state.setSelectedDate(freq.date),
                     ),
                     // todo FrequencyChart ререндерится оч часто
-                    //  мб из-за context.read<EditHabitState>().habitToEdit == null
-
+                    //  мб из-за context.read<EditHabitState>().habitToEdit == null - нет
+                    //  хз поч все перерисовывается - опускаю руки пока
                     builder: (context, tuple, __) {
                       print("rerendered");
 
