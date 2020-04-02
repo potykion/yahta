@@ -29,11 +29,11 @@ class HabitListView extends StatelessWidget {
                   MaterialPageRoute(builder: (_) => EditHabitPage(vm.habit.id)),
                 );
 
-                var state = Provider.of<HabitState>(context, listen: false);
+                var state = Provider.of<ListHabitState>(context, listen: false);
                 await state.loadDateHabits();
               },
               onLongPress: () async {
-                var state = Provider.of<HabitState>(context, listen: false);
+                var state = Provider.of<ListHabitState>(context, listen: false);
                 await state.createHabitMark(vm.habit.id);
               },
             ),
@@ -88,7 +88,7 @@ class _CreateHabitInputState extends State<CreateHabitInput> {
             icon: Icon(Icons.add),
             onPressed: canAdd
                 ? () async {
-                    var state = Provider.of<HabitState>(context, listen: false);
+                    var state = Provider.of<ListHabitState>(context, listen: false);
                     await state.createHabit(controller.text);
 
                     controller.text = "";

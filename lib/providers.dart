@@ -12,9 +12,9 @@ var providers = [
     create: (context) =>
         HabitRepo(Provider.of<Database>(context, listen: false)),
   ),
-  ChangeNotifierProvider<HabitState>(
+  ChangeNotifierProvider<ListHabitState>(
     create: (context) =>
-        HabitState(Provider.of<HabitRepo>(context, listen: false)),
+        ListHabitState(Provider.of<HabitRepo>(context, listen: false)),
   ),
   ChangeNotifierProvider<EditHabitState>(
     create: (context) =>

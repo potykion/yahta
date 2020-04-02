@@ -3,18 +3,17 @@ import 'package:moor_ffi/moor_ffi.dart';
 import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/db.dart';
 import 'package:yahta/logic/habit/state.dart';
-import 'package:yahta/logic/habit/view_models.dart';
 
 void main() {
   Database _db;
   HabitRepo repo;
-  HabitState habitState;
+  ListHabitState habitState;
   EditHabitState editHabitState;
 
   setUp(() {
     _db = Database(VmDatabase.memory());
     repo = HabitRepo(_db);
-    habitState = HabitState(repo);
+    habitState = ListHabitState(repo);
     editHabitState = EditHabitState(repo);
   });
   tearDown(() async {
@@ -36,7 +35,8 @@ void main() {
       await repo.insertHabitMark(habitId, DateTime(2020, 3, 31));
 
       await editHabitState.loadHabitToEdit(habitId);
-      await editHabitState.loadWeeklyHabitMarks(WeekDateRange(DateTime(2020, 3, 30)));
+      await editHabitState
+          .loadWeeklyHabitMarks(WeekDateRange(DateTime(2020, 3, 30)));
 
       expect(editHabitState.habitMarks.length, 2);
     });
@@ -63,15 +63,32 @@ void main() {
 
     test("Удаление отметки привычки", () async {
       var habitId = await repo.insertHabit("title");
-      var habitMarkId = await repo.insertHabitMark(habitId, DateTime(2020, 3, 30));
+      var habitMarkId =
+          await repo.insertHabitMark(habitId, DateTime(2020, 3, 30));
       await editHabitState.loadHabitToEdit(habitId);
-      await editHabitState.loadWeeklyHabitMarks(WeekDateRange(DateTime(2020, 3, 30)));
+      await editHabitState
+          .loadWeeklyHabitMarks(WeekDateRange(DateTime(2020, 3, 30)));
 
       var mark = await repo.getHabitMarkById(habitMarkId);
       await editHabitState.deleteHabitMark(mark);
 
       expect(editHabitState.habitMarks.length, 0);
       expect((await repo.getHabitMarkById(habitMarkId)), isNull);
+    });
+
+    test("Обновление отметки привычки", () async {
+      var habitId = await repo.insertHabit("title");
+      var habitMarkId =
+          await repo.insertHabitMark(habitId, DateTime(2020, 3, 30));
+      await editHabitState.loadHabitToEdit(habitId);
+      await editHabitState
+          .loadWeeklyHabitMarks(WeekDateRange(DateTime(2020, 3, 30)));
+
+      var newDate = DateTime(2020, 4, 2);
+      var mark = await repo.getHabitMarkById(habitMarkId);
+      await editHabitState.updateHabitMark(mark, datetime: newDate);
+
+      expect((await repo.getHabitMarkById(habitMarkId)).datetime, newDate);
     });
   });
 }

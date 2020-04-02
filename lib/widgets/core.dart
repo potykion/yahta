@@ -116,8 +116,6 @@ class FrequencyChart extends StatelessWidget {
           colorFn: (_, __) => charts.ColorUtil.fromDartColor(color),
         ),
       ],
-      // todo надо чтоб линия строилась при нажатии
-      //  наверн оно не робит из-за того часто стейт обновляется
       // Событие нажатия на точку графика
       selectionModels: [
         charts.SelectionModelConfig(

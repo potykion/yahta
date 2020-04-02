@@ -78,10 +78,9 @@ class DayHabitMarkListView extends StatelessWidget {
                 icon: Icon(Icons.edit),
                 onPressed: () => DatePicker.showTimePicker(
                   context,
-                  onConfirm: (DateTime newDateTime) async {
-                    await Provider.of<HabitState>(context, listen: false)
-                        .updateHabitMark(mark, datetime: newDateTime);
-                  },
+                  onConfirm: (DateTime newDateTime) async => await context
+                      .read<EditHabitState>()
+                      .updateHabitMark(mark, datetime: newDateTime),
                   currentTime: mark.datetime,
                 ),
               ),
@@ -114,4 +113,3 @@ class DayHabitMarkListView extends StatelessWidget {
     return ListView(children: markListTiles);
   }
 }
-

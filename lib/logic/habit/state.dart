@@ -115,53 +115,36 @@ class EditHabitState extends ChangeNotifier {
     selectedDate = dateTime;
     notifyListeners();
   }
+
+  updateHabitMark(HabitMark mark, {DateTime datetime}) {
+    var updatedMark = mark.copyWith(datetime: datetime);
+
+    _habitRepo.updateHabitMark(updatedMark);
+
+    habitMarks.remove(mark);
+    habitMarks.add(updatedMark);
+    notifyListeners();
+  }
 }
 
-// todo split to ListHabitState & EditHabitState
-class HabitState extends ChangeNotifier {
+class ListHabitState extends ChangeNotifier {
   /// Флаг загрузки списка привычек
   bool loading = false;
 
   /// Текущая дата, используется для фильтра отметок привычек за день
   /// Используется в основном в списке привычек
-  /// todo Мб имеет смысл туда его перенести
   var currentDate = DateTime.now();
 
   /// Список привычек и отметок за день
   List<HabitViewModel> habitVMs = [];
 
-  /// Редактируемая привычка
-  HabitViewModel habitToEdit;
-
-  /// Дата, по которой фильтруются отметки редактируемой привычки
-  DateTime habitMarkStatsDate;
-
   /// Абстракция над бд
   HabitRepo habitRepo;
 
-  HabitState(this.habitRepo);
+  ListHabitState(this.habitRepo);
 
   setCurrentDate(DateTime dateTime) {
     this.currentDate = dateTime;
-    notifyListeners();
-  }
-
-  setHabitMarkStatsDate(DateTime dateTime) {
-    habitMarkStatsDate = dateTime;
-    notifyListeners();
-  }
-
-  setHabitToEdit(HabitViewModel habitViewModel) async {
-    var currentWeekDateRange = WeekDateRange(this.currentDate);
-
-    habitToEdit = HabitViewModel(
-        habitViewModel.habit,
-        await habitRepo.listHabitMarksBetween(
-          currentWeekDateRange.fromDateTime,
-          currentWeekDateRange.toDateTime,
-          habitViewModel.habit.id,
-        ));
-
     notifyListeners();
   }
 
@@ -202,26 +185,6 @@ class HabitState extends ChangeNotifier {
     var habit = await habitRepo.getHabitById(habitId);
     habitVMs.add(HabitViewModel(habit, []));
 
-    notifyListeners();
-  }
-
-  loadWeeklyHabits(WeekDateRange weekDateRange) async {
-    habitToEdit.habitMarks = await habitRepo.listHabitMarksBetween(
-      weekDateRange.fromDateTime,
-      weekDateRange.toDateTime,
-      habitToEdit.habit.id,
-    );
-    notifyListeners();
-  }
-
-  updateHabitMark(HabitMark mark, {DateTime datetime}) async {
-    var updatedMark = mark.copyWith(datetime: datetime);
-
-    await habitRepo.updateHabitMark(updatedMark);
-
-    habitToEdit.habitMarks =
-        habitToEdit.habitMarks.where((m) => m.id != mark.id).toList() +
-            [updatedMark];
     notifyListeners();
   }
 }

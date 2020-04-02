@@ -15,15 +15,15 @@ class _ListHabitsPageState extends State<ListHabitsPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      var state = Provider.of<HabitState>(context, listen: false);
+      var state = Provider.of<ListHabitState>(context, listen: false);
       await state.loadDateHabits();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<HabitState>(
-      builder: (BuildContext context, HabitState state, Widget child) {
+    return Consumer<ListHabitState>(
+      builder: (BuildContext context, ListHabitState state, Widget child) {
         return new Scaffold(
           appBar: AppBar(
             title: Text(DayDateTimeRange(state.currentDate).toString()),
