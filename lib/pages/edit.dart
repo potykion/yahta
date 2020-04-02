@@ -43,7 +43,7 @@ class _EditHabitPageState extends State<EditHabitPage> {
                     HabitType.positive]
             .primaryColor,
       ),
-      body: context.read<EditHabitState>().habitToEdit == null
+      body: context.watch<EditHabitState>().habitToEdit == null
           ? Center(child: Text("Ща"))
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
