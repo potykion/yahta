@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:tuple/tuple.dart';
 import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/view_models.dart';
 import 'package:yahta/styles.dart';
@@ -156,11 +157,21 @@ class ListHabitState extends ChangeNotifier {
     var habitMarks =
         await habitRepo.listHabitMarksForDate(DayDateTimeRange(currentDate));
 
+    List<Tuple2<int, DateTime>> latestHabitMarks =
+        await habitRepo.getLatestHabitMarksBeforeToday();
+
     habitVMs = habits
         .map(
           (habit) => HabitListViewModel(
             habit,
-            habitMarks.where((mark) => mark.habitId == habit.id).toList(),
+            habitMarks:
+                habitMarks.where((mark) => mark.habitId == habit.id).toList(),
+            latestMarkDateBeforeToday: latestHabitMarks
+                .firstWhere(
+                  (mark) => mark.item1 == habit.id,
+                  orElse: () => Tuple2(habit.id, habit.createdDate),
+                )
+                .item2,
           ),
         )
         .toList();
@@ -183,7 +194,7 @@ class ListHabitState extends ChangeNotifier {
     var habitId = await habitRepo.insertHabit(title);
 
     var habit = await habitRepo.getHabitById(habitId);
-    habitVMs.add(HabitListViewModel(habit, []));
+    habitVMs.add(HabitListViewModel(habit, habitMarks: []));
 
     notifyListeners();
   }

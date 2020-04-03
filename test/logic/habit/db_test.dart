@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:moor_ffi/moor_ffi.dart';
+import 'package:tuple/tuple.dart';
 import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/db.dart';
 
@@ -99,5 +100,13 @@ void main() {
       expect(mark, isNull);
     });
 
+    test("Получение последней даты отметки", () async {
+      var habitId = await repo.insertHabit("Бегать");
+      await repo.insertHabitMark(habitId, DateTime(2020, 3, 21));
+
+      var tuples = await repo.getLatestHabitMarksBeforeToday(DateTime(2020, 3, 22));
+
+      expect(tuples.first, Tuple2(habitId, DateTime(2020, 3, 21)));
+    });
   });
 }

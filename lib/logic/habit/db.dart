@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:moor/moor.dart';
+import 'package:tuple/tuple.dart';
 import 'package:yahta/logic/core/date.dart';
 
 part 'db.g.dart';
@@ -53,7 +54,9 @@ class Database extends _$Database {
   Future<int> insertHabit(HabitsCompanion habitsCompanion) =>
       into(habits).insert(habitsCompanion);
 
-  Future<List<Habit>> listHabits() => (select(habits)..orderBy([(mark) => OrderingTerm(expression: mark.type)])).get();
+  Future<List<Habit>> listHabits() =>
+      (select(habits)..orderBy([(mark) => OrderingTerm(expression: mark.type)]))
+          .get();
 
   Stream<List<Habit>> listHabitsStream() => select(habits).watch();
 
@@ -94,6 +97,26 @@ class Database extends _$Database {
 
   updateHabitMark(HabitMark mark) => update(habitMarks).replace(mark);
 
+  Future<List<Tuple2<int, DateTime>>> getLatestHabitMarkDatesBeforeToday(
+      DateTime dateTime) async {
+    final query = customSelectQuery(
+      "select habit_id, max(datetime) as max_datetime "
+      "from habit_marks "
+      "where datetime < :dateTime",
+      variables: [Variable.withDateTime(dateTime)],
+    );
+    var rows = await query.get();
+    var tuples = rows.map(
+      (row) {
+        return Tuple2<int, DateTime>(
+          row.data["habit_id"],
+          DateTimeType().mapFromDatabaseResponse(row.data["max_datetime"]),
+        );
+      },
+    ).toList();
+
+    return tuples;
+  }
 }
 
 class HabitRepo {
@@ -130,12 +153,20 @@ class HabitRepo {
 
   Future deleteHabit(Habit habit) => db.deleteHabitById(habit.id);
 
-  Future<List<HabitMark>> listHabitMarks(int habitId) => db.listHabitMarks(habitId);
+  Future<List<HabitMark>> listHabitMarks(int habitId) =>
+      db.listHabitMarks(habitId);
 
-  Future<List<HabitMark>> listHabitMarksBetween(DateTime from, DateTime to, [habitId]) =>
+  Future<List<HabitMark>> listHabitMarksBetween(DateTime from, DateTime to,
+          [habitId]) =>
       db.listHabitMarksBetween(from, to, habitId);
 
   Future deleteHabitMark(HabitMark mark) => db.deleteHabitMarkById(mark.id);
 
   Future updateHabitMark(HabitMark mark) => db.updateHabitMark(mark);
+
+  Future<List<Tuple2<int, DateTime>>> getLatestHabitMarksBeforeToday(
+          [DateTime today]) =>
+      db.getLatestHabitMarkDatesBeforeToday(
+        today ?? DayDateTimeRange().fromDateTime,
+      );
 }

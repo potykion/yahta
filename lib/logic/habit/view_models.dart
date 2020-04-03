@@ -10,8 +10,9 @@ part 'view_models.freezed.dart';
 class HabitListViewModel {
   Habit habit;
   List<HabitMark> habitMarks;
+  DateTime latestMarkDateBeforeToday;
 
-  HabitListViewModel(this.habit, this.habitMarks);
+  HabitListViewModel(this.habit, {this.habitMarks, latestMarkDateBeforeToday}) : latestMarkDateBeforeToday = latestMarkDateBeforeToday ?? DateTime.now();
 }
 
 @freezed

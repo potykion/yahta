@@ -21,11 +21,12 @@ class DateTimeEnd {
 class DayDateTimeRange {
   DateTime initialDateTime;
 
-  DayDateTimeRange(this.initialDateTime);
+  DayDateTimeRange([initialDateTime])
+      : this.initialDateTime = initialDateTime ?? DateTime.now();
 
-  get fromDateTime => DateTimeStart(initialDateTime).dateTime;
+  DateTime get fromDateTime => DateTimeStart(initialDateTime).dateTime;
 
-  get toDateTime => DateTimeEnd(initialDateTime).dateTime;
+  DateTime get toDateTime => DateTimeEnd(initialDateTime).dateTime;
 
   matchDatetime(DateTime dateTime) =>
       dateTime.isAfter(fromDateTime) && dateTime.isBefore(toDateTime) ||
