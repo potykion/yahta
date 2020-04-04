@@ -144,6 +144,8 @@ class ListHabitState extends ChangeNotifier {
 
   ListHabitState(this.habitRepo);
 
+  get currentDateIsToday => DayDateTimeRange().matchDatetime(this.currentDate);
+
   setCurrentDate(DateTime dateTime) {
     this.currentDate = dateTime;
     notifyListeners();

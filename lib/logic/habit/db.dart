@@ -99,10 +99,11 @@ class Database extends _$Database {
 
   Future<List<Tuple2<int, DateTime>>> getLatestHabitMarkDatesBeforeToday(
       DateTime dateTime) async {
-    final query = customSelectQuery(
+    var query = customSelectQuery(
       "select habit_id, max(datetime) as max_datetime "
       "from habit_marks "
-      "where datetime < :dateTime",
+      "where datetime <= :dateTime "
+      "group by habit_id",
       variables: [Variable.withDateTime(dateTime)],
     );
     var rows = await query.get();
@@ -167,6 +168,6 @@ class HabitRepo {
   Future<List<Tuple2<int, DateTime>>> getLatestHabitMarksBeforeToday(
           [DateTime today]) =>
       db.getLatestHabitMarkDatesBeforeToday(
-        today ?? DayDateTimeRange().fromDateTime,
+        today ?? DayDateTimeRange().toDateTime,
       );
 }

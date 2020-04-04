@@ -12,7 +12,11 @@ class HabitListViewModel {
   List<HabitMark> habitMarks;
   DateTime latestMarkDateBeforeToday;
 
-  HabitListViewModel(this.habit, {this.habitMarks, latestMarkDateBeforeToday}) : latestMarkDateBeforeToday = latestMarkDateBeforeToday ?? DateTime.now();
+  HabitListViewModel(this.habit, {this.habitMarks, latestMarkDateBeforeToday})
+      : latestMarkDateBeforeToday = latestMarkDateBeforeToday ?? DateTime.now();
+
+  bool get noUpdatesInTwoDays =>
+      DateTime.now().difference(this.latestMarkDateBeforeToday).inDays >= 2;
 }
 
 @freezed

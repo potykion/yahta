@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yahta/logic/habit/db.dart';
 import 'package:yahta/logic/habit/state.dart';
 import 'package:yahta/logic/habit/view_models.dart';
 import 'package:yahta/pages/edit.dart';
@@ -20,9 +21,14 @@ class HabitListView extends StatelessWidget {
     return ListView(
       children: habits
           .map(
-            (vm) => ListTile(
+            (HabitListViewModel vm) => ListTile(
               leading: HabitMarkCounter(vm),
               title: Text(vm.habit.title),
+              subtitle: context.read<ListHabitState>().currentDateIsToday &&
+                      vm.habit.type == HabitType.positive &&
+                      vm.noUpdatesInTwoDays
+                  ? Text("Привычка давно не обновлялась!")
+                  : null,
               onTap: () async {
                 await Navigator.push(
                   context,
@@ -88,7 +94,8 @@ class _CreateHabitInputState extends State<CreateHabitInput> {
             icon: Icon(Icons.add),
             onPressed: canAdd
                 ? () async {
-                    var state = Provider.of<ListHabitState>(context, listen: false);
+                    var state =
+                        Provider.of<ListHabitState>(context, listen: false);
                     await state.createHabit(controller.text);
 
                     controller.text = "";
