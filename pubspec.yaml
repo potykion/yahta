@@ -51,7 +51,6 @@ dependencies:
   tuple: ^1.0.3
 
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -71,7 +70,12 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: fonts/Montserrat-Regular.ttf
+        - asset: fonts/Montserrat-SemiBold.ttf
+          weight: 600
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

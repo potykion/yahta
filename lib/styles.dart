@@ -69,6 +69,3 @@ Map<HabitType, HabitTypeTheme> HabitTypeThemeMap = {
   ),
 };
 
-ThemeData AppTheme = ThemeData(
-  primarySwatch: Colors.green,
-);
