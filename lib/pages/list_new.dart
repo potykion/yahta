@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class NewHabitListPage extends StatefulWidget {
   @override
@@ -54,16 +55,33 @@ class HabitRow extends StatefulWidget {
 class _HabitRowState extends State<HabitRow> {
   String habitTitle;
   double opacity = 1;
+  SlidableController controller;
 
   @override
   void initState() {
     super.initState();
     habitTitle = widget.habitTitle;
+
+    controller = SlidableController(
+        onSlideAnimationChanged: (Animation<double> anim) {
+          print(anim.value);
+          setState(() {
+            opacity = anim.value;
+          });
+        } ,
+        onSlideIsOpenChanged: (open) {
+
+        }
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
+    return Slidable(
+      actionPane: SlidableBehindActionPane(),
+//      actionPane: SlidableScrollActionPane(),
+//    actionPane: SlidableDrawerActionPane(),
+//      actionPane: SlidableStrechActionPane(),
       child: Row(
         children: <Widget>[
           Container(
@@ -78,8 +96,9 @@ class _HabitRowState extends State<HabitRow> {
               style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
-                  decoration:
-                      habitTitle == "Рисовать" ? null : TextDecoration.lineThrough),
+                  decoration: habitTitle == "Рисовать"
+                      ? null
+                      : TextDecoration.lineThrough),
             ),
           ),
           Spacer(),
@@ -90,24 +109,21 @@ class _HabitRowState extends State<HabitRow> {
           )
         ],
       ),
-      key: Key(habitTitle),
-      background: Container(
-        color: Color(0xff95E1D3),
-      ),
-      secondaryBackground: Container(
-        color: Color(0xffF88181).withOpacity(opacity),
-      ),
-      direction: habitTitle == "Рисовать"
-          ? DismissDirection.endToStart
-          : DismissDirection.startToEnd,
-      confirmDismiss: (DismissDirection dir) async {
-        setState(() {
-          habitTitle = dir == DismissDirection.endToStart ? "ass" : "Рисовать";
-        });
+      actions: <Widget>[],
+      secondaryActions: <Widget>[
+        Container(color: Color(0xffF88181).withOpacity(opacity),)
 
-        return false;
-      },
-
+//        Container(
+//          decoration: BoxDecoration(
+//            gradient: LinearGradient(
+//              begin: Alignment.centerRight,
+//              end: Alignment.centerLeft,
+//              colors: [Color(0xff95E1D3), Color(0xffF88181)],
+//            ),
+//          ),
+//        )
+      ],
+      controller: controller,
     );
   }
 }
