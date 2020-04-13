@@ -68,26 +68,21 @@ class _HabitRowState extends State<HabitRow> {
           setState(() {
             opacity = anim.value;
           });
-        } ,
-        onSlideIsOpenChanged: (open) {
-
-        }
-    );
+        },
+        onSlideIsOpenChanged: (open) {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return Slidable(
-      actionPane: SlidableBehindActionPane(),
-//      actionPane: SlidableScrollActionPane(),
-//    actionPane: SlidableDrawerActionPane(),
-//      actionPane: SlidableStrechActionPane(),
+    return Dismissible(
       child: Row(
         children: <Widget>[
           Container(
             width: 8,
             height: 60,
-            color: habitTitle == "Рисовать" ? null : Color(0xff95E1D3),
+            color: habitTitle == "Рисовать"
+                ? Color(0xffF88181)
+                : Color(0xff95E1D3),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -101,29 +96,27 @@ class _HabitRowState extends State<HabitRow> {
                       : TextDecoration.lineThrough),
             ),
           ),
-          Spacer(),
-          Container(
-            width: 8,
-            height: 60,
-            color: habitTitle != "Рисовать" ? null : Color(0xffF88181),
-          )
+//          Spacer(),
+//          Container(
+//            width: 8,
+//            height: 60,
+//            color: habitTitle != "Рисовать" ? null : ,
+//          )
         ],
       ),
-      actions: <Widget>[],
-      secondaryActions: <Widget>[
-        Container(color: Color(0xffF88181).withOpacity(opacity),)
+      key: Key(habitTitle),
+      confirmDismiss: (dir) async {
+        setState(() {
+          habitTitle = habitTitle == "Рисовать" ? "ass" : "Рисовать";
+        });
 
-//        Container(
-//          decoration: BoxDecoration(
-//            gradient: LinearGradient(
-//              begin: Alignment.centerRight,
-//              end: Alignment.centerLeft,
-//              colors: [Color(0xff95E1D3), Color(0xffF88181)],
-//            ),
-//          ),
-//        )
-      ],
-      controller: controller,
+        return false;
+      },
+      direction: habitTitle == "Рисовать"
+          ? DismissDirection.endToStart
+          : DismissDirection.startToEnd,
+//      resizeDuration: habitTitle == "Рисовать" ? Duration(milliseconds: 2) : Duration(seconds: 2),
+//      movementDuration: habitTitle == "Рисовать" ? Duration(milliseconds: 2) : Duration(seconds: 2),
     );
   }
 }
