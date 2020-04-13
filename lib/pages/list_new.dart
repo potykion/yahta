@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
+
+class HabitViewModel {
+  int id;
+  String title;
+  bool completed;
+
+  HabitViewModel({this.id, this.title, this.completed = false});
+}
 
 class NewHabitListPage extends StatefulWidget {
   @override
@@ -8,7 +15,11 @@ class NewHabitListPage extends StatefulWidget {
 }
 
 class _NewHabitListPageState extends State<NewHabitListPage> {
-  List<String> habits = ["Рисовать", "Читать", "Пилить трекер"];
+  List<HabitViewModel> habits = [
+    HabitViewModel(id: 1, title: "Рисовать"),
+    HabitViewModel(id: 2, title: "Читать"),
+    HabitViewModel(id: 3, title: "Пилить трекер"),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +35,7 @@ class _NewHabitListPageState extends State<NewHabitListPage> {
               style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600),
             ),
           ),
-          color: Color(0xffF88181),
+          color: habits.every((h) => h.completed) ? Color(0xff95E1D3) : Color(0xffF88181),
         ),
         preferredSize: Size.fromHeight(124),
       ),
@@ -34,42 +45,28 @@ class _NewHabitListPageState extends State<NewHabitListPage> {
           height: 20,
         ),
         itemBuilder: (BuildContext context, int index) =>
-            HabitRow(habitTitle: habits[index]),
+            HabitRow(habits[index]),
       ),
     );
   }
 }
 
 class HabitRow extends StatefulWidget {
-  const HabitRow({
-    Key key,
-    @required this.habitTitle,
-  }) : super(key: key);
+  final HabitViewModel habit;
 
-  final String habitTitle;
+  HabitRow(this.habit);
 
   @override
   _HabitRowState createState() => _HabitRowState();
 }
 
 class _HabitRowState extends State<HabitRow> {
-  String habitTitle;
-  double opacity = 1;
-  SlidableController controller;
+  HabitViewModel habit;
 
   @override
   void initState() {
     super.initState();
-    habitTitle = widget.habitTitle;
-
-    controller = SlidableController(
-        onSlideAnimationChanged: (Animation<double> anim) {
-          print(anim.value);
-          setState(() {
-            opacity = anim.value;
-          });
-        },
-        onSlideIsOpenChanged: (open) {});
+    habit = widget.habit;
   }
 
   @override
@@ -77,46 +74,37 @@ class _HabitRowState extends State<HabitRow> {
     return Dismissible(
       child: Row(
         children: <Widget>[
-          Container(
-            width: 8,
-            height: 60,
-            color: habitTitle == "Рисовать"
-                ? Color(0xffF88181)
-                : Color(0xff95E1D3),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
+            child: CircleAvatar(
+              backgroundColor:
+              habit.completed ? Color(0xff95E1D3) : Color(0xffF88181),
+              radius: 10,
+            ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 0),
             child: Text(
-              habitTitle.toUpperCase(),
+              habit.title.toUpperCase(),
               style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
-                  decoration: habitTitle == "Рисовать"
-                      ? null
-                      : TextDecoration.lineThrough),
+                  decoration: habit.completed ? TextDecoration.lineThrough : null),
             ),
-          ),
-//          Spacer(),
-//          Container(
-//            width: 8,
-//            height: 60,
-//            color: habitTitle != "Рисовать" ? null : ,
-//          )
+          )
         ],
       ),
-      key: Key(habitTitle),
+      key: Key(habit.id.toString()),
       confirmDismiss: (dir) async {
         setState(() {
-          habitTitle = habitTitle == "Рисовать" ? "ass" : "Рисовать";
+          habit.completed = !habit.completed;
         });
 
         return false;
       },
-      direction: habitTitle == "Рисовать"
-          ? DismissDirection.endToStart
-          : DismissDirection.startToEnd,
-//      resizeDuration: habitTitle == "Рисовать" ? Duration(milliseconds: 2) : Duration(seconds: 2),
-//      movementDuration: habitTitle == "Рисовать" ? Duration(milliseconds: 2) : Duration(seconds: 2),
+      direction: habit.completed
+          ? DismissDirection.startToEnd
+          : DismissDirection.endToStart,
     );
   }
 }
