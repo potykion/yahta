@@ -1,7 +1,9 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:yahta/logic/core/db.dart';
 import 'package:yahta/logic/habit/db.dart';
 import 'package:yahta/logic/habit/state.dart';
+import 'package:yahta/logic/habit_bloc.dart';
 
 var providers = [
   Provider<Database>(
@@ -20,4 +22,7 @@ var providers = [
     create: (context) =>
         EditHabitState(Provider.of<HabitRepo>(context, listen: false)),
   ),
+  BlocProvider(
+    create: (context) => HabitBloc(),
+  )
 ];

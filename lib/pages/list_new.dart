@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-class HabitViewModel {
-  int id;
-  String title;
-  bool completed;
-
-  HabitViewModel({this.id, this.title, this.completed = false});
-}
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yahta/logic/habit_bloc.dart';
 
 class NewHabitListPage extends StatefulWidget {
   @override
@@ -15,11 +9,11 @@ class NewHabitListPage extends StatefulWidget {
 }
 
 class _NewHabitListPageState extends State<NewHabitListPage> {
-  List<HabitViewModel> habits = [
-    HabitViewModel(id: 1, title: "Рисовать"),
-    HabitViewModel(id: 2, title: "Читать"),
-    HabitViewModel(id: 3, title: "Пилить трекер"),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<HabitBloc>(context).add(HabitsLoadedEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,47 +21,41 @@ class _NewHabitListPageState extends State<NewHabitListPage> {
 
     return Scaffold(
       appBar: PreferredSize(
-        child: Container(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Text(
-              "Расписание\nна сегодня".toUpperCase(),
-              style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600),
-            ),
-          ),
-          color: habits.every((h) => h.completed) ? Color(0xff95E1D3) : Color(0xffF88181),
+        child: BlocBuilder<HabitBloc, HabitState>(
+          builder: (BuildContext context, state) {
+            return Container(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  "Расписание\nна сегодня".toUpperCase(),
+                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600),
+                ),
+              ),
+              color:
+                  state.habitsCompleted ? Color(0xff95E1D3) : Color(0xffF88181),
+            );
+          },
         ),
         preferredSize: Size.fromHeight(124),
       ),
-      body: ListView.separated(
-        itemCount: habits.length,
-        separatorBuilder: (BuildContext context, int index) => SizedBox(
-          height: 20,
+      body: BlocBuilder<HabitBloc, HabitState>(
+        builder: (BuildContext context, HabitState state) => ListView.separated(
+          itemCount: state.habitsSorted.length,
+          separatorBuilder: (BuildContext context, int index) => SizedBox(
+            height: 20,
+          ),
+          itemBuilder: (BuildContext context, int index) =>
+              HabitRow(state.habitsSorted[index]),
         ),
-        itemBuilder: (BuildContext context, int index) =>
-            HabitRow(habits[index]),
       ),
     );
   }
 }
 
-class HabitRow extends StatefulWidget {
-  final HabitViewModel habit;
-
-  HabitRow(this.habit);
-
-  @override
-  _HabitRowState createState() => _HabitRowState();
-}
-
-class _HabitRowState extends State<HabitRow> {
+class HabitRow extends StatelessWidget {
   HabitViewModel habit;
 
-  @override
-  void initState() {
-    super.initState();
-    habit = widget.habit;
-  }
+  HabitRow(this.habit);
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +66,7 @@ class _HabitRowState extends State<HabitRow> {
             padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
             child: CircleAvatar(
               backgroundColor:
-              habit.completed ? Color(0xff95E1D3) : Color(0xffF88181),
+                  habit.completed ? Color(0xff95E1D3) : Color(0xffF88181),
               radius: 10,
             ),
           ),
@@ -89,16 +77,17 @@ class _HabitRowState extends State<HabitRow> {
               style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
-                  decoration: habit.completed ? TextDecoration.lineThrough : null),
+                  decoration:
+                      habit.completed ? TextDecoration.lineThrough : null),
             ),
           )
         ],
       ),
       key: Key(habit.id.toString()),
       confirmDismiss: (dir) async {
-        setState(() {
-          habit.completed = !habit.completed;
-        });
+        BlocProvider.of<HabitBloc>(context).add(habit.completed
+            ? HabitIncompletedEvent(habit.id)
+            : HabitCompletedEvent(habit.id));
 
         return false;
       },

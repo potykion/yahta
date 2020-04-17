@@ -26,13 +26,13 @@ dependencies:
   # форматирование даты
   intl: ^0.16.1
 
-  # абстракция над склайт
+  # абстракция над sqlite
   moor: 2.4.2
   moor_ffi: 0.4.0
   path_provider:
   path:
 
-  # di + state-management
+  # di
   provider: ^4.0.4
 
   # графики
@@ -50,15 +50,15 @@ dependencies:
   # кортежики
   tuple: ^1.0.3
 
-  # альтернатива dismissible
-  flutter_slidable: ^0.5.4
-
+  # стейт-менеджмент
+  bloc: ^3.0.0
+  flutter_bloc: ^3.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  # кодогенерация для склайт абстракций
+  # кодогенерация для sqlite абстракций
   moor_generator: 2.4.0
   build_runner:
 
