@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:yahta/logic/habit_bloc.dart';
 
 class NewHabitListPage extends StatefulWidget {
@@ -9,6 +10,8 @@ class NewHabitListPage extends StatefulWidget {
 }
 
 class _NewHabitListPageState extends State<NewHabitListPage> {
+  int swiperIndex = 2;
+
   @override
   void initState() {
     super.initState();
@@ -18,35 +21,61 @@ class _NewHabitListPageState extends State<NewHabitListPage> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays([]);
+    return Scaffold(appBar: buildListAppBar(), body: buildHabitList());
+  }
 
-    return Scaffold(
-      appBar: PreferredSize(
-        child: BlocBuilder<HabitBloc, HabitState>(
-          builder: (BuildContext context, state) {
-            return Container(
+  PreferredSize buildListAppBar() {
+    return PreferredSize(
+      child: BlocBuilder<HabitBloc, HabitState>(
+        builder: (BuildContext context, state) {
+          return Swiper(
+            itemBuilder: (context, int index) => Container(
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  "Расписание\nна сегодня".toUpperCase(),
-                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      state.dateRelationToStr,
+                      style:
+                          TextStyle(fontSize: 36, fontWeight: FontWeight.w600),
+                    ),
+                  ],
                 ),
               ),
               color:
                   state.habitsCompleted ? Color(0xff95E1D3) : Color(0xffF88181),
-            );
-          },
-        ),
-        preferredSize: Size.fromHeight(124),
+            ),
+            index: swiperIndex,
+            itemCount: 3,
+            loop: false,
+            onIndexChanged: (index) {
+              setState(() {
+                swiperIndex = index;
+              });
+              BlocProvider.of<HabitBloc>(context).add(
+                DateRelationChangedEvent(SwiperIndexToDateRelation[index]),
+              );
+
+              // todo load habits on-index-change
+            },
+          );
+        },
       ),
-      body: BlocBuilder<HabitBloc, HabitState>(
-        builder: (BuildContext context, HabitState state) => ListView.separated(
-          itemCount: state.habitsSorted.length,
-          separatorBuilder: (BuildContext context, int index) => SizedBox(
-            height: 20,
-          ),
-          itemBuilder: (BuildContext context, int index) =>
-              HabitRow(state.habitsSorted[index]),
+      preferredSize: Size.fromHeight(124),
+    );
+  }
+
+  BlocBuilder<HabitBloc, HabitState> buildHabitList() {
+    return BlocBuilder<HabitBloc, HabitState>(
+      builder: (BuildContext context, HabitState state) => ListView.separated(
+        itemCount: state.habitsSorted.length,
+        separatorBuilder: (BuildContext context, int index) => SizedBox(
+          height: 20,
         ),
+        itemBuilder: (BuildContext context, int index) =>
+            HabitRow(state.habitsSorted[index]),
       ),
     );
   }
