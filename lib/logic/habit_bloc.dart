@@ -27,9 +27,11 @@ class HabitViewModel {
 class HabitState {
   List<HabitViewModel> habits;
 
-  HabitState([this.habits = const []]);
+  HabitState([habits]) : this.habits = habits ?? [];
 
-  List<HabitViewModel> get habitsSorted => habits..sort((h1, h2) => h1.id.compareTo(h2.id));
+  List<HabitViewModel> get habitsSorted =>
+      habits..sort((h1, h2) => h1.id.compareTo(h2.id));
+
   bool get habitsCompleted => habits.every((h) => h.completed);
 }
 
