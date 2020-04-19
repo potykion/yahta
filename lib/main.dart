@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:yahta/pages/list_new.dart';
 import 'package:yahta/providers.dart';
+
+import 'list/pages.dart';
 
 void main() => runApp(new MyApp());
 
