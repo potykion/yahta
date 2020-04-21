@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yahta/providers.dart';
 
+import 'list/new.dart';
 import 'list/pages.dart';
 
 void main() => runApp(new MyApp());
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             fontFamily: "Montserrat"
           ),
-          home: NewHabitListPage(),
+          home: YAHabitListPage(),
         ),
       );
 }
