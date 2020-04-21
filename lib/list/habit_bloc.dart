@@ -1,8 +1,16 @@
 import 'package:bloc/bloc.dart';
+import 'package:yahta/list/smth.dart';
+import 'package:yahta/list/widgets.dart';
 import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/db.dart';
 
 enum DateRelation { today, yesterday, twoDaysAgo }
+
+List<DateRelation> OrderedDateRelations = [
+  DateRelation.twoDaysAgo,
+  DateRelation.yesterday,
+  DateRelation.today,
+];
 
 Map<DateRelation, Duration> DateRelationToDuration = {
   DateRelation.today: Duration(days: 0),
@@ -41,9 +49,6 @@ class DateRelationChangedEvent extends HabitEvent {
 class DateRelationHabitViewModel {
   DateRelation dateRelation;
   List<HabitViewModel> habits;
-
-
-
 }
 
 class HabitViewModel {
@@ -61,6 +66,17 @@ class HabitState {
   HabitState({habits, habitMarks})
       : this.habits = habits ?? [],
         this.habitMarks = habitMarks ?? [];
+
+  get appBarTitles => [
+    "Итоги за\nпозавчера",
+    "Итоги за\nвчера",
+    "Расписание\nна сегодня"
+  ];
+
+  get appBarColors => OrderedDateRelations
+      .map((dr) => computeDateRelationCompletionStatus(this.habits, this.habitMarks, dr))
+      .map((status) => StatusToColorMap[status])
+      .toList();
 
 //  todo: pizda
   Map<DateRelation, List<HabitViewModel>> get dateRelationHabitViewModels {

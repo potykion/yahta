@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:yahta/list/smth.dart';
 
-Color PositiveColor = Color(0xff95E1D3);
-Color NeutralColor = Color(0xffFCE38A);
-Color NegativeColor = Color(0xffF88181);
-
-
+Map<DateStatus, Color> StatusToColorMap = {
+  DateStatus.positive: Color(0xff95E1D3),
+  DateStatus.neutral: Color(0xffFCE38A),
+  DateStatus.negative: Color(0xffF88181),
+};
 
 class StrokedCircle extends StatelessWidget {
   final Color innerColor;
@@ -24,7 +25,6 @@ class StrokedCircle extends StatelessWidget {
   }
 }
 
-
 class PageAppBar extends StatelessWidget {
   final String text;
   final Color color;
@@ -33,11 +33,13 @@ class PageAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       child: Padding(
-        padding:
-         EdgeInsets.only(top:0 + MediaQuery.of(context).padding.top, bottom : 0.0, left: 30, right: 30),
+        padding: EdgeInsets.only(
+            top: 0 + MediaQuery.of(context).padding.top,
+            bottom: 0.0,
+            left: 30,
+            right: 30),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
