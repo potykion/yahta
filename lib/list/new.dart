@@ -26,22 +26,42 @@ class YAHabitListPage extends StatelessWidget {
     return buildSizedAppBar(
       context,
       BlocBuilder<HabitBloc, HabitState>(
-        builder: (BuildContext context, HabitState state) => AppBars(
-          titles: state.appBarTitles,
-          colors: state.appBarColors,
+        builder: (BuildContext context, HabitState state) => DateRelationAppBar(
+          dateRelationTitles: state.appBarTitles,
+          dateRelationColors: state.appBarColors,
+          onDateRelationChange: (dr) => BlocProvider.of<HabitBloc>(context).add(
+            DateRelationChangedEvent(dr),
+          ),
         ),
       ),
     );
   }
 
-  Widget buildListView() => ListView();
+  Widget buildListView() => BlocBuilder<HabitBloc, HabitState>(
+    builder: (context, state) => ListView(children: <Widget>[
+      Text(state.selectedDateRelation.toString())
+    ],),
+  );
 }
 
-class AppBars extends StatelessWidget {
-  final List<String> titles;
-  final List<Color> colors;
+typedef OnDateRelationChange = void Function(DateRelation dateRelation);
 
-  AppBars({this.titles, this.colors});
+class DateRelationAppBar extends StatefulWidget {
+  final Map<DateRelation, String> dateRelationTitles;
+  final Map<DateRelation, Color> dateRelationColors;
+  final OnDateRelationChange onDateRelationChange;
+
+  DateRelationAppBar(
+      {this.dateRelationTitles,
+      this.dateRelationColors,
+      this.onDateRelationChange});
+
+  @override
+  _DateRelationAppBarState createState() => _DateRelationAppBarState();
+}
+
+class _DateRelationAppBarState extends State<DateRelationAppBar> {
+  int selectedIndex = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -54,15 +74,24 @@ class AppBars extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              Text(titles[index].toUpperCase(),
-                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600)),
+              Text(
+                widget.dateRelationTitles[SwiperIndexToDateRelation[index]]
+                    .toUpperCase(),
+                style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600),
+              ),
             ],
           ),
         ),
-        color: colors[index],
+        color: widget.dateRelationColors[SwiperIndexToDateRelation[index]],
       ),
-      index: 2,
+      index: selectedIndex,
       loop: false,
+      onIndexChanged: (index) {
+        setState(() {
+          selectedIndex = index;
+        });
+        widget.onDateRelationChange(SwiperIndexToDateRelation[index]);
+      },
     );
   }
 }

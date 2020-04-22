@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:yahta/list/smth.dart';
 import 'package:yahta/list/widgets.dart';
 import 'package:yahta/logic/core/date.dart';
@@ -62,21 +63,31 @@ class HabitViewModel {
 class HabitState {
   List<Habit> habits;
   List<HabitMark> habitMarks;
+  DateRelation selectedDateRelation;
 
-  HabitState({habits, habitMarks})
+  HabitState({habits, habitMarks, selectedDateRelation})
       : this.habits = habits ?? [],
-        this.habitMarks = habitMarks ?? [];
+        this.habitMarks = habitMarks ?? [],
+        this.selectedDateRelation = selectedDateRelation ?? DateRelation.today;
 
-  get appBarTitles => [
-    "Итоги за\nпозавчера",
-    "Итоги за\nвчера",
-    "Расписание\nна сегодня"
-  ];
+  Map<DateRelation, String> get appBarTitles => {
+        DateRelation.twoDaysAgo: "Итоги за\nпозавчера",
+        DateRelation.yesterday: "Итоги за\nвчера",
+        DateRelation.today: "Расписание\nна сегодня"
+      };
 
-  get appBarColors => OrderedDateRelations
-      .map((dr) => computeDateRelationCompletionStatus(this.habits, this.habitMarks, dr))
-      .map((status) => StatusToColorMap[status])
-      .toList();
+  Map<DateRelation, Color> get appBarColors => Map.fromEntries(
+        OrderedDateRelations.map(
+          (dr) => MapEntry(
+            dr,
+            StatusToColorMap[computeDateRelationCompletionStatus(
+              this.habits,
+              this.habitMarks,
+              dr,
+            )],
+          ),
+        ),
+      );
 
 //  todo: pizda
   Map<DateRelation, List<HabitViewModel>> get dateRelationHabitViewModels {
@@ -137,16 +148,28 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
     if (event is HabitsLoadedEvent) {
       var habits = await habitRepo.listHabits();
       var habitMarks = await habitRepo.listHabitMarksBetween(
-          DateTime.now().subtract(Duration(days: 2)), DateTime.now());
+        DateTime.now().add(DateRelationToDuration[DateRelation.twoDaysAgo]),
+        DateTime.now(),
+      );
 
-      yield HabitState(habits: habits, habitMarks: habitMarks);
-      print("done");
+      yield HabitState(
+        habits: habits,
+        habitMarks: habitMarks,
+        selectedDateRelation: state.selectedDateRelation,
+      );
+    } else if (event is DateRelationChangedEvent) {
+      yield HabitState(
+        habits: state.habits,
+        habitMarks: state.habitMarks,
+        selectedDateRelation: event.dateRelation,
+      );
     } else if (event is HabitCompletedEvent) {
       var markId = await habitRepo.insertHabitMark(event.id);
       var mark = await habitRepo.getHabitMarkById(markId);
-      var newState = HabitState(
-          habits: state.habits, habitMarks: state.habitMarks..add(mark));
-      yield newState;
+      yield HabitState(
+        habits: state.habits,
+        habitMarks: state.habitMarks..add(mark),
+      );
     } else if (event is HabitIncompletedEvent) {
       yield state;
 //      var habitToIncomplete = state.habits.firstWhere((h) => h.id == event.id);
