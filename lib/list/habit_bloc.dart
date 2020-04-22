@@ -25,6 +25,12 @@ Map<int, DateRelation> SwiperIndexToDateRelation = {
   2: DateRelation.today,
 };
 
+Map<DateRelation, int> DateRelationToSwiperIndex = {
+  DateRelation.twoDaysAgo: 0,
+  DateRelation.yesterday: 1,
+  DateRelation.today: 2,
+};
+
 class HabitEvent {}
 
 class HabitsLoadedEvent extends HabitEvent {}
