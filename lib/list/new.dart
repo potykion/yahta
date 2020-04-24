@@ -10,10 +10,21 @@ extension StatusBarHeightComputing on BuildContext {
 
 buildSizedAppBar(BuildContext context, Widget appBar) => PreferredSize(
       child: appBar,
-      preferredSize: Size.fromHeight(80 + context.statusBarHeight),
+      preferredSize: Size.fromHeight(70 + context.statusBarHeight),
     );
 
-class YAHabitListPage extends StatelessWidget {
+class YAHabitListPage extends StatefulWidget {
+  @override
+  _YAHabitListPageState createState() => _YAHabitListPageState();
+}
+
+class _YAHabitListPageState extends State<YAHabitListPage> {
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<HabitBloc>(context).add(HabitsLoadedEvent());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,8 +49,41 @@ class YAHabitListPage extends StatelessWidget {
   }
 
   Widget buildListView() => BlocBuilder<HabitBloc, HabitState>(
-        builder: (context, state) => ListView(
-          children: <Widget>[Text(state.selectedDateRelation.toString())],
+        builder: (context, state) => ListView.builder(
+          itemBuilder: (BuildContext context, int index) {
+            var viewModel = state.habitViewModels[index];
+
+            return Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+              child: Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    backgroundColor:
+                        StatusToColorMap[viewModel.completionStatus],
+                    radius: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 8,
+                    ),
+                    child: Text(
+                      viewModel.title,
+                      style: TextStyle(
+                        fontSize: 24,
+                        decoration: viewModel.completed
+                            ? TextDecoration.lineThrough
+                            : null,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
+          itemCount: state.habitViewModels.length,
+//          separatorBuilder: (BuildContext context, int index) => Divider(),
         ),
       );
 }
@@ -87,8 +131,7 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               Text(
-                widget.dateRelationTitles[selectedDateRelation]
-                    .toUpperCase(),
+                widget.dateRelationTitles[selectedDateRelation].toUpperCase(),
                 style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600),
               ),
             ],

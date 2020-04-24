@@ -5,6 +5,10 @@ import 'package:yahta/list/widgets.dart';
 import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/db.dart';
 
+////////////////////////////////////////////////////////////////////////////////
+// MODELS AND MAPPINGS
+////////////////////////////////////////////////////////////////////////////////
+
 enum DateRelation { today, yesterday, twoDaysAgo }
 
 List<DateRelation> OrderedDateRelations = [
@@ -31,40 +35,25 @@ Map<DateRelation, int> DateRelationToSwiperIndex = {
   DateRelation.today: 2,
 };
 
-class HabitEvent {}
-
-class HabitsLoadedEvent extends HabitEvent {}
-
-class HabitCompletedEvent extends HabitEvent {
-  int id;
-
-  HabitCompletedEvent(this.id);
-}
-
-class HabitIncompletedEvent extends HabitEvent {
-  int id;
-
-  HabitIncompletedEvent(this.id);
-}
-
-class DateRelationChangedEvent extends HabitEvent {
-  DateRelation dateRelation;
-
-  DateRelationChangedEvent(this.dateRelation);
-}
-
-class DateRelationHabitViewModel {
-  DateRelation dateRelation;
-  List<HabitViewModel> habits;
-}
-
 class HabitViewModel {
-  int id;
-  String title;
-  bool completed;
+  Habit habit;
+  List<HabitMark> habitMarks;
 
-  HabitViewModel({this.id, this.title, this.completed = false});
+  HabitViewModel({this.habit, this.habitMarks});
+
+  int get id => habit.id;
+
+  String get title => habit.title;
+
+  bool get completed => this.habitMarks.length > 0;
+
+  CompletionStatus get completionStatus =>
+      completed ? CompletionStatus.positive : CompletionStatus.negative;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// STATE
+////////////////////////////////////////////////////////////////////////////////
 
 class HabitState {
   List<Habit> habits;
@@ -95,51 +84,52 @@ class HabitState {
         ),
       );
 
-//  todo: pizda
-  Map<DateRelation, List<HabitViewModel>> get dateRelationHabitViewModels {
-    var map = Map.fromEntries(
-      [DateRelation.today, DateRelation.yesterday, DateRelation.twoDaysAgo].map(
-        (dr) {
-          var drDateRange =
-              DayDateTimeRange(DateTime.now().add(DateRelationToDuration[dr]));
+  DayDateTimeRange get dateRelationDateRange => DayDateTimeRange(
+        DateTime.now().add(DateRelationToDuration[selectedDateRelation]),
+      );
 
-          return MapEntry(
-            dr,
-            this.habits.map(
-              (h) {
-                var completed = this
-                        .habitMarks
-                        .where((hm) => hm.habitId == h.id)
-                        .where((hm) => drDateRange.matchDatetime(hm.datetime))
-                        .length >
-                    0;
-
-                return HabitViewModel(
-                  id: h.id,
-                  title: h.title,
-                  completed: completed,
-                );
-              },
-            ),
-          );
-        },
-      ),
-    );
-
-    return map;
-  }
-
-  Map<DateRelation, bool> get dateRelationHabitCompletions => {
-        DateRelation.today: dateRelationHabitViewModels[DateRelation.today]
-            .every((vm) => vm.completed),
-        DateRelation.yesterday:
-            dateRelationHabitViewModels[DateRelation.yesterday]
-                .every((vm) => vm.completed),
-        DateRelation.twoDaysAgo:
-            dateRelationHabitViewModels[DateRelation.twoDaysAgo]
-                .every((vm) => vm.completed),
-      };
+  List<HabitViewModel> get habitViewModels => habits
+      .map(
+        (h) => HabitViewModel(
+          habit: h,
+          habitMarks: habitMarks
+              .where((hm) => hm.habitId == h.id)
+              .where((hm) => dateRelationDateRange.matchDatetime(hm.datetime))
+              .toList(),
+        ),
+      )
+      .toList();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// EVENTS
+////////////////////////////////////////////////////////////////////////////////
+
+class HabitEvent {}
+
+class HabitsLoadedEvent extends HabitEvent {}
+
+class HabitCompletedEvent extends HabitEvent {
+  int id;
+
+  HabitCompletedEvent(this.id);
+}
+
+class HabitIncompletedEvent extends HabitEvent {
+  int id;
+
+  HabitIncompletedEvent(this.id);
+}
+
+class DateRelationChangedEvent extends HabitEvent {
+  DateRelation dateRelation;
+
+  DateRelationChangedEvent(this.dateRelation);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// BLOC
+////////////////////////////////////////////////////////////////////////////////
 
 class HabitBloc extends Bloc<HabitEvent, HabitState> {
   HabitRepo habitRepo;

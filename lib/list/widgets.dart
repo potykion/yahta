@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:yahta/list/smth.dart';
 
-Map<DateStatus, Color> StatusToColorMap = {
-  DateStatus.positive: Color(0xff95E1D3),
-  DateStatus.neutral: Color(0xffFCE38A),
-  DateStatus.negative: Color(0xffF88181),
+Map<CompletionStatus, Color> StatusToColorMap = {
+  CompletionStatus.positive: Color(0xff95E1D3),
+  CompletionStatus.neutral: Color(0xffFCE38A),
+  CompletionStatus.negative: Color(0xffF88181),
 };
 
 class StrokedCircle extends StatelessWidget {

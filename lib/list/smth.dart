@@ -2,7 +2,7 @@ import 'package:yahta/list/habit_bloc.dart';
 import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/db.dart';
 
-enum DateStatus { positive, neutral, negative }
+enum CompletionStatus { positive, neutral, negative }
 
 computeDateRelationCompletionStatus(
   List<Habit> habits,
@@ -15,12 +15,12 @@ computeDateRelationCompletionStatus(
   );
 
   if (allHabitIds == completedHabitIds) {
-    return DateStatus.positive;
+    return CompletionStatus.positive;
   }
   if (completedHabitIds.length == 0) {
-    return DateStatus.negative;
+    return CompletionStatus.negative;
   }
-  return DateStatus.neutral;
+  return CompletionStatus.neutral;
 }
 
 uniqueHabitIds({List<Habit> habits, List<HabitMark> habitMarks}) {
