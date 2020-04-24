@@ -53,37 +53,49 @@ class _YAHabitListPageState extends State<YAHabitListPage> {
           itemBuilder: (BuildContext context, int index) {
             var viewModel = state.habitViewModels[index];
 
-            return Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-              child: Row(
-                children: <Widget>[
-                  CircleAvatar(
-                    backgroundColor:
-                        StatusToColorMap[viewModel.completionStatus],
-                    radius: 10,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 8,
+            return Dismissible(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+                child: Row(
+                  children: <Widget>[
+                    CircleAvatar(
+                      backgroundColor:
+                          StatusToColorMap[viewModel.completionStatus],
+                      radius: 10,
                     ),
-                    child: Text(
-                      viewModel.title,
-                      style: TextStyle(
-                        fontSize: 24,
-                        decoration: viewModel.completed
-                            ? TextDecoration.lineThrough
-                            : null,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 8,
                       ),
-                    ),
-                  )
-                ],
+                      child: Text(
+                        viewModel.title,
+                        style: TextStyle(
+                          fontSize: 24,
+                          decoration: viewModel.completed
+                              ? TextDecoration.lineThrough
+                              : null,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
+              key: Key(viewModel.id.toString()),
+              confirmDismiss: (DismissDirection dismissDirection) async {
+                BlocProvider.of<HabitBloc>(context).add(viewModel.completed
+                    ? HabitIncompletedEvent(viewModel.id)
+                    : HabitCompletedEvent(viewModel.id));
+
+                return false;
+              },
+              direction: viewModel.completed
+                  ? DismissDirection.startToEnd
+                  : DismissDirection.endToStart,
             );
           },
           itemCount: state.habitViewModels.length,
-//          separatorBuilder: (BuildContext context, int index) => Divider(),
         ),
       );
 }

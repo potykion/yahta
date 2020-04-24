@@ -144,7 +144,9 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
     if (event is HabitsLoadedEvent) {
       var habits = await habitRepo.listHabits();
       var habitMarks = await habitRepo.listHabitMarksBetween(
-        DateTime.now().add(DateRelationToDuration[DateRelation.twoDaysAgo]),
+        DayDateTimeRange(DateTime.now()
+                .add(DateRelationToDuration[DateRelation.twoDaysAgo]))
+            .fromDateTime,
         DateTime.now(),
       );
 
@@ -160,21 +162,33 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
         selectedDateRelation: event.dateRelation,
       );
     } else if (event is HabitCompletedEvent) {
-      var markId = await habitRepo.insertHabitMark(event.id);
+      var markId = await habitRepo.insertHabitMark(
+        event.id,
+        DateTime.now().add(DateRelationToDuration[state.selectedDateRelation]),
+      );
       var mark = await habitRepo.getHabitMarkById(markId);
       yield HabitState(
         habits: state.habits,
         habitMarks: state.habitMarks..add(mark),
+        selectedDateRelation: state.selectedDateRelation,
       );
     } else if (event is HabitIncompletedEvent) {
-      yield state;
-//      var habitToIncomplete = state.habits.firstWhere((h) => h.id == event.id);
-//      habitToIncomplete.completed = false;
-//
-//      var newHabits = state.habits.where((h) => h.id != event.id).toList();
-//      newHabits.add(habitToIncomplete);
-//
-//      yield HabitState(habits: newHabits);
+      var marksToRemove = state.habitMarks
+          .where((hm) => hm.habitId == event.id)
+          .where(
+              (hm) => state.dateRelationDateRange.matchDatetime(hm.datetime));
+      await Future.wait(
+        marksToRemove.map((hm) => habitRepo.deleteHabitMark((hm))),
+      );
+
+      var newHabitMarks =
+          state.habitMarks.where((hm) => !marksToRemove.contains(hm)).toList();
+
+      yield HabitState(
+        habits: state.habits,
+        habitMarks: newHabitMarks,
+        selectedDateRelation: state.selectedDateRelation,
+      );
     }
   }
 }

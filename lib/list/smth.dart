@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:yahta/list/habit_bloc.dart';
 import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/db.dart';
@@ -14,20 +15,21 @@ computeDateRelationCompletionStatus(
     habitMarks: filterDateRelationHabitMarks(habitMarks, dateRelation),
   );
 
-  if (allHabitIds == completedHabitIds) {
+  if (SetEquality().equals(allHabitIds, completedHabitIds)) {
     return CompletionStatus.positive;
   }
-  if (completedHabitIds.length == 0) {
+  else if (completedHabitIds.length == 0) {
     return CompletionStatus.negative;
   }
-  return CompletionStatus.neutral;
+  else {
+    return CompletionStatus.neutral;
+  }
 }
 
-uniqueHabitIds({List<Habit> habits, List<HabitMark> habitMarks}) {
-  return ((habits ?? []).map((h) => h.id).toList() +
-          (habitMarks ?? []).map((h) => h.habitId).toList())
-      .toSet();
-}
+Set<int> uniqueHabitIds({List<Habit> habits, List<HabitMark> habitMarks}) =>
+    ((habits ?? []).map((h) => h.id).toList() +
+            (habitMarks ?? []).map((h) => h.habitId).toList())
+        .toSet();
 
 List<HabitMark> filterDateRelationHabitMarks(
         List<HabitMark> habitMarks, DateRelation dateRelation) =>
