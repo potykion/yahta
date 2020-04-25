@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:yahta/providers.dart';
 
 import 'list/new.dart';
-import 'list/pages.dart';
 
 void main() => runApp(new MyApp());
 
