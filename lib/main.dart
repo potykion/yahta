@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yahta/providers.dart';
 
-import 'list/new.dart';
+import 'list/list_page.dart';
 
 void main() => runApp(new MyApp());
 
