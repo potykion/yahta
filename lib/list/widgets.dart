@@ -57,29 +57,46 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
   Widget build(BuildContext context) {
     return Swiper(
       itemCount: OrderedDateRelations.length,
-      itemBuilder: (context, index) => Container(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Text(
-                widget.dateRelationTitles[selectedDateRelation].toUpperCase(),
-                style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600),
-              ),
-            ],
+      itemBuilder: (context, index) {
+        var dateRelation = SwiperIndexToDateRelation[index];
+
+        return Container(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.dateRelationTitles[dateRelation].toUpperCase(),
+                      style:
+                          TextStyle(fontSize: 36, fontWeight: FontWeight.w600),
+                    ),
+                    SwiperIndexToDateRelation[index] == DateRelation.today
+                        ? IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: () {
+                              print("hi");
+                            })
+                        : Container()
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-        color: widget.dateRelationColors[selectedDateRelation],
-      ),
+          color: widget.dateRelationColors[dateRelation],
+        );
+      },
       index: selectedIndex,
       loop: false,
       onIndexChanged: (index) {
         setState(() {
           selectedIndex = index;
         });
-        widget.onDateRelationChange(selectedDateRelation);
+        widget.onDateRelationChange(SwiperIndexToDateRelation[index]);
       },
     );
   }
