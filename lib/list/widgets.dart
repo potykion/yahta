@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-
+import 'package:yahta/logic/core/context_apis.dart';
 import 'habit_bloc.dart';
 
 class StrokedCircle extends StatelessWidget {
@@ -73,15 +73,8 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
                     Text(
                       widget.dateRelationTitles[dateRelation].toUpperCase(),
                       style:
-                          TextStyle(fontSize: 36, fontWeight: FontWeight.w600),
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                     ),
-                    SwiperIndexToDateRelation[index] == DateRelation.today
-                        ? IconButton(
-                            icon: Icon(Icons.add),
-                            onPressed: () {
-                              print("hi");
-                            })
-                        : Container()
                   ],
                 ),
               ],
@@ -111,7 +104,7 @@ class HabitRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dismissible(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+        padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
         child: Row(
           children: <Widget>[
             CircleAvatar(
@@ -123,7 +116,7 @@ class HabitRow extends StatelessWidget {
               child: Text(
                 viewModel.title,
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 18,
                   decoration:
                       viewModel.completed ? TextDecoration.lineThrough : null,
                 ),
@@ -143,6 +136,52 @@ class HabitRow extends StatelessWidget {
       direction: viewModel.completed
           ? DismissDirection.startToEnd
           : DismissDirection.endToStart,
+    );
+  }
+}
+
+class AddHabitForm extends StatefulWidget {
+  @override
+  _AddHabitFormState createState() => _AddHabitFormState();
+}
+
+class _AddHabitFormState extends State<AddHabitForm> {
+  String habitText = "";
+  TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller.addListener(() => setState(() => habitText = controller.text));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      child: TextFormField(
+        controller: controller,
+        style: TextStyle(fontSize: 18),
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: 'чем хочешь заниматься?',
+          suffixIcon: habitText.isNotEmpty
+              ? IconButton(
+                  onPressed: () {
+                    BlocProvider.of<HabitBloc>(context)
+                        .add(HabitCreatedEvent(habitText));
+                    controller.text = "";
+                    context.removeFocus();
+                  },
+                  icon: Icon(Icons.done),
+                )
+              : null,
+        ),
+      ),
+      padding: EdgeInsets.symmetric(
+        vertical: 8,
+        horizontal: 16,
+      ),
     );
   }
 }

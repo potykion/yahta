@@ -22,7 +22,12 @@ class _YAHabitListPageState extends State<YAHabitListPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: buildAppBar(context),
-        body: buildListView(),
+        body: Column(
+          children: <Widget>[
+            Flexible(child: buildListView()),
+            AddHabitForm(),
+          ],
+        ),
       );
 
   PreferredSizeWidget buildAppBar(BuildContext context) => buildSizedAppBar(
@@ -38,7 +43,7 @@ class _YAHabitListPageState extends State<YAHabitListPage> {
         ),
       );
 
-  buildSizedAppBar(BuildContext context, Widget appBar, {size: 70}) =>
+  buildSizedAppBar(BuildContext context, Widget appBar, {size: 64}) =>
       PreferredSize(
         child: appBar,
         preferredSize: Size.fromHeight(size + context.statusBarHeight),

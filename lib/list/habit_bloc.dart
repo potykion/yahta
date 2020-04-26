@@ -169,6 +169,12 @@ class DateRelationChangedEvent extends HabitEvent {
   DateRelationChangedEvent(this.dateRelation);
 }
 
+class HabitCreatedEvent extends HabitEvent {
+  String habitTitle;
+
+  HabitCreatedEvent(this.habitTitle);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // BLOC
 ////////////////////////////////////////////////////////////////////////////////
@@ -229,6 +235,14 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
       yield HabitState(
         habits: state.habits,
         habitMarks: newHabitMarks,
+        selectedDateRelation: state.selectedDateRelation,
+      );
+    } else if (event is HabitCreatedEvent) {
+      var habitId = await habitRepo.insertHabit(event.habitTitle);
+      var habit = await habitRepo.getHabitById(habitId);
+      yield HabitState(
+        habits: state.habits..add(habit),
+        habitMarks: state.habitMarks,
         selectedDateRelation: state.selectedDateRelation,
       );
     }
