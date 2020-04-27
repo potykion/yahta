@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yahta/list/habit_bloc.dart';
 import 'package:yahta/list/widgets.dart';
+import 'package:yahta/logic/core/context_apis.dart';
 
-extension StatusBarHeightComputing on BuildContext {
-  get statusBarHeight => MediaQuery.of(this).padding.top;
-}
 
 class YAHabitListPage extends StatefulWidget {
   @override
@@ -43,7 +41,7 @@ class _YAHabitListPageState extends State<YAHabitListPage> {
         ),
       );
 
-  buildSizedAppBar(BuildContext context, Widget appBar, {size: 64}) =>
+  buildSizedAppBar(BuildContext context, Widget appBar, {size: 80}) =>
       PreferredSize(
         child: appBar,
         preferredSize: Size.fromHeight(size + context.statusBarHeight),

@@ -65,37 +65,27 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
         return Stack(
 //          overflow: Overflow.visible,
           children: [
-            Column(
-              children: [
-                Container(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              widget.dateRelationTitles[dateRelation]
-                                  .toUpperCase(),
-                              style: TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+            Container(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 8),
+                child: Align(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        widget.dateRelationTitles[dateRelation]
+                            .toUpperCase(),
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.w600),
+                      ),
+                    ],
                   ),
-                  color: widget.dateRelationColors[dateRelation],
+                  alignment: Alignment(0, 0.5),
                 ),
-                Container(
-                  height: 20,
-                  color: widget.dateRelationColors[dateRelation],
-                ),
-              ],
+              ),
+              color: widget.dateRelationColors[dateRelation],
+            height: 84+ context.statusBarHeight,
             ),
             Positioned(
               child: StrokedCircle(
