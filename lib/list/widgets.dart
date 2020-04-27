@@ -58,29 +58,67 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
     return Swiper(
       itemCount: OrderedDateRelations.length,
       itemBuilder: (context, index) {
+        var previousDateRelation = SwiperIndexToDateRelation[index - 1];
         var dateRelation = SwiperIndexToDateRelation[index];
+        var nextDateRelation = SwiperIndexToDateRelation[index + 1];
 
-        return Container(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      widget.dateRelationTitles[dateRelation].toUpperCase(),
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+        return Stack(
+//          overflow: Overflow.visible,
+          children: [
+            Column(
+              children: [
+                Container(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              widget.dateRelationTitles[dateRelation]
+                                  .toUpperCase(),
+                              style: TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
+                  color: widget.dateRelationColors[dateRelation],
+                ),
+                Container(
+                  height: 20,
+                  color: widget.dateRelationColors[dateRelation],
                 ),
               ],
             ),
-          ),
-          color: widget.dateRelationColors[dateRelation],
+            Positioned(
+              child: StrokedCircle(
+                innerColor: widget.dateRelationColors[previousDateRelation],
+              ),
+              bottom: 0,
+              left: -15,
+            ),
+            Positioned(
+              child: StrokedCircle(
+                innerColor: widget.dateRelationColors[dateRelation],
+              ),
+              bottom: 0,
+              left: 30,
+            ),
+            Positioned(
+              child: StrokedCircle(
+                innerColor: widget.dateRelationColors[nextDateRelation],
+              ),
+              bottom: 0,
+              right: -15,
+            ),
+          ],
         );
       },
       index: selectedIndex,
@@ -104,7 +142,7 @@ class HabitRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dismissible(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+        padding: EdgeInsets.symmetric(vertical: 4, horizontal: 35),
         child: Row(
           children: <Widget>[
             CircleAvatar(
