@@ -41,7 +41,7 @@ class _YAHabitListPageState extends State<YAHabitListPage> {
         ),
       );
 
-  buildSizedAppBar(BuildContext context, Widget appBar, {size: 80}) =>
+  buildSizedAppBar(BuildContext context, Widget appBar, {size: 50}) =>
       PreferredSize(
         child: appBar,
         preferredSize: Size.fromHeight(size + context.statusBarHeight),

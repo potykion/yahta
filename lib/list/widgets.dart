@@ -81,16 +81,17 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
             ),
           ),
           color: widget.dateRelationColors[dateRelation],
-          height: 84 + context.statusBarHeight,
+//          height: 84 + context.statusBarHeight,
         );
 
+        var bottom = -15.0;
         List<Widget> statusCircles = [];
         if (previousDateRelation != null) {
           statusCircles.add(Positioned(
             child: StrokedCircle(
               innerColor: widget.dateRelationColors[previousDateRelation],
             ),
-            bottom: 0,
+            bottom: bottom,
             left: -15,
           ));
         }
@@ -98,7 +99,7 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
           child: StrokedCircle(
             innerColor: widget.dateRelationColors[dateRelation],
           ),
-          bottom: 0,
+          bottom: bottom,
           left: 30,
         ));
         if (nextDateRelation != null) {
@@ -106,7 +107,7 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
             child: StrokedCircle(
               innerColor: widget.dateRelationColors[nextDateRelation],
             ),
-            bottom: 0,
+            bottom: bottom,
             right: -15,
           ));
         }
