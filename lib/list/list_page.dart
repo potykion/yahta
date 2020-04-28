@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yahta/list/habit_bloc.dart';
+import 'package:yahta/list/view_models.dart';
 import 'package:yahta/list/widgets.dart';
 import 'package:yahta/logic/core/context_apis.dart';
-
 
 class YAHabitListPage extends StatefulWidget {
   @override
@@ -33,7 +33,7 @@ class _YAHabitListPageState extends State<YAHabitListPage> {
         BlocBuilder<HabitBloc, HabitState>(
           builder: (BuildContext context, HabitState state) =>
               DateRelationAppBar(
-            dateRelationTitles: state.appBarTitles,
+            dateRelationTitles: AppBarTitles,
             dateRelationColors: state.appBarColors,
             onDateRelationChange: (dr) => BlocProvider.of<HabitBloc>(context)
                 .add(DateRelationChangedEvent(dr)),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:yahta/list/view_models.dart';
 import 'package:yahta/logic/core/context_apis.dart';
 import 'habit_bloc.dart';
+import 'models.dart';
 
 class StrokedCircle extends StatelessWidget {
   final Color innerColor;
@@ -62,53 +64,56 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
         var dateRelation = SwiperIndexToDateRelation[index];
         var nextDateRelation = SwiperIndexToDateRelation[index + 1];
 
-        return Stack(
-//          overflow: Overflow.visible,
-          children: [
-            Container(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 8),
-                child: Align(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        widget.dateRelationTitles[dateRelation]
-                            .toUpperCase(),
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.w600),
-                      ),
-                    ],
+        var appBar = Container(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+            child: Align(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.dateRelationTitles[dateRelation].toUpperCase(),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                   ),
-                  alignment: Alignment(0, 0.5),
-                ),
+                ],
               ),
-              color: widget.dateRelationColors[dateRelation],
-            height: 84+ context.statusBarHeight,
+              alignment: Alignment(0, 0.5),
             ),
-            Positioned(
-              child: StrokedCircle(
-                innerColor: widget.dateRelationColors[previousDateRelation],
-              ),
-              bottom: 0,
-              left: -15,
+          ),
+          color: widget.dateRelationColors[dateRelation],
+          height: 84 + context.statusBarHeight,
+        );
+
+        List<Widget> statusCircles = [];
+        if (previousDateRelation != null) {
+          statusCircles.add(Positioned(
+            child: StrokedCircle(
+              innerColor: widget.dateRelationColors[previousDateRelation],
             ),
-            Positioned(
-              child: StrokedCircle(
-                innerColor: widget.dateRelationColors[dateRelation],
-              ),
-              bottom: 0,
-              left: 30,
+            bottom: 0,
+            left: -15,
+          ));
+        }
+        statusCircles.add(Positioned(
+          child: StrokedCircle(
+            innerColor: widget.dateRelationColors[dateRelation],
+          ),
+          bottom: 0,
+          left: 30,
+        ));
+        if (nextDateRelation != null) {
+          statusCircles.add(Positioned(
+            child: StrokedCircle(
+              innerColor: widget.dateRelationColors[nextDateRelation],
             ),
-            Positioned(
-              child: StrokedCircle(
-                innerColor: widget.dateRelationColors[nextDateRelation],
-              ),
-              bottom: 0,
-              right: -15,
-            ),
-          ],
+            bottom: 0,
+            right: -15,
+          ));
+        }
+
+        return Stack(
+          overflow: Overflow.visible,
+          children: [appBar].cast<Widget>() + statusCircles,
         );
       },
       index: selectedIndex,

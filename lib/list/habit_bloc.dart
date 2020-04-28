@@ -1,62 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:yahta/list/view_models.dart';
 import 'package:yahta/logic/core/date.dart';
 import 'package:yahta/logic/habit/db.dart';
-import 'package:collection/collection.dart';
 
-////////////////////////////////////////////////////////////////////////////////
-// MODELS AND MAPPINGS
-////////////////////////////////////////////////////////////////////////////////
-
-enum CompletionStatus { positive, neutral, negative }
-
-Map<CompletionStatus, Color> StatusToColorMap = {
-  CompletionStatus.positive: Color(0xff95E1D3),
-  CompletionStatus.neutral: Color(0xffFCE38A),
-  CompletionStatus.negative: Color(0xffF88181),
-};
-
-enum DateRelation { today, yesterday, twoDaysAgo }
-
-List<DateRelation> OrderedDateRelations = [
-  DateRelation.twoDaysAgo,
-  DateRelation.yesterday,
-  DateRelation.today,
-];
-
-Map<DateRelation, Duration> DateRelationToDuration = {
-  DateRelation.today: Duration(days: 0),
-  DateRelation.yesterday: Duration(days: -1),
-  DateRelation.twoDaysAgo: Duration(days: -2),
-};
-
-Map<int, DateRelation> SwiperIndexToDateRelation = {
-  0: DateRelation.twoDaysAgo,
-  1: DateRelation.yesterday,
-  2: DateRelation.today,
-};
-
-Map<DateRelation, int> DateRelationToSwiperIndex = {
-  DateRelation.twoDaysAgo: 0,
-  DateRelation.yesterday: 1,
-  DateRelation.today: 2,
-};
-
-class HabitViewModel {
-  Habit habit;
-  List<HabitMark> habitMarks;
-
-  HabitViewModel({this.habit, this.habitMarks});
-
-  int get id => habit.id;
-
-  String get title => habit.title;
-
-  bool get completed => this.habitMarks.length > 0;
-
-  CompletionStatus get completionStatus =>
-      completed ? CompletionStatus.positive : CompletionStatus.negative;
-}
+import 'models.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
 // STATE
@@ -72,74 +20,38 @@ class HabitState {
         this.habitMarks = habitMarks ?? [],
         this.selectedDateRelation = selectedDateRelation ?? DateRelation.today;
 
-  Map<DateRelation, String> get appBarTitles => {
-        DateRelation.twoDaysAgo: "Итоги за\nпозавчера",
-        DateRelation.yesterday: "Итоги за\nвчера",
-        DateRelation.today: "Расписание\nна сегодня"
-      };
+  Map<DateRelation, CompletionStatus> get dateRelationCompletions =>
+      Map.fromEntries(OrderedDateRelations.map((dr) {
+        CompletionStatus completionStatus;
 
-  Map<DateRelation, Color> get appBarColors => Map.fromEntries(
-        OrderedDateRelations.map(
-          (dr) => MapEntry(
-            dr,
-            StatusToColorMap[computeDateRelationCompletionStatus(
-              this.habits,
-              this.habitMarks,
-              dr,
-            )],
-          ),
-        ),
+        if (habitViewModels.every((vm) => vm.completed)) {
+          completionStatus = CompletionStatus.positive;
+        } else if (habitViewModels.every((vm) => !vm.completed)) {
+          completionStatus = CompletionStatus.negative;
+        } else {
+          completionStatus = CompletionStatus.neutral;
+        }
+
+        return MapEntry(dr, completionStatus);
+      }));
+
+  Map<DateRelation, Color> get appBarColors => dateRelationCompletions.map(
+        (dr, completionStatus) =>
+            MapEntry(dr, StatusToColorMap[completionStatus]),
       );
-
-  computeDateRelationCompletionStatus(
-    List<Habit> habits,
-    List<HabitMark> habitMarks,
-    DateRelation dateRelation,
-  ) {
-    var allHabitIds = uniqueHabitIds(habits: habits);
-    var completedHabitIds = uniqueHabitIds(
-      habitMarks: filterDateRelationHabitMarks(habitMarks, dateRelation),
-    );
-
-    if (SetEquality().equals(allHabitIds, completedHabitIds)) {
-      return CompletionStatus.positive;
-    } else if (completedHabitIds.length == 0) {
-      return CompletionStatus.negative;
-    } else {
-      return CompletionStatus.neutral;
-    }
-  }
-
-  Set<int> uniqueHabitIds({List<Habit> habits, List<HabitMark> habitMarks}) =>
-      ((habits ?? []).map((h) => h.id).toList() +
-              (habitMarks ?? []).map((h) => h.habitId).toList())
-          .toSet();
-
-  List<HabitMark> filterDateRelationHabitMarks(
-          List<HabitMark> habitMarks, DateRelation dateRelation) =>
-      habitMarks
-          .where((hm) =>
-              dateRelationToDateRange(dateRelation).matchDatetime(hm.datetime))
-          .toList();
-
-  DayDateTimeRange dateRelationToDateRange(DateRelation dateRelation) =>
-      DayDateTimeRange(
-          DateTime.now().add(DateRelationToDuration[dateRelation]));
 
   DayDateTimeRange get dateRelationDateRange => DayDateTimeRange(
         DateTime.now().add(DateRelationToDuration[selectedDateRelation]),
       );
 
   List<HabitViewModel> get habitViewModels => habits
-      .map(
-        (h) => HabitViewModel(
-          habit: h,
-          habitMarks: habitMarks
-              .where((hm) => hm.habitId == h.id)
-              .where((hm) => dateRelationDateRange.matchDatetime(hm.datetime))
-              .toList(),
-        ),
-      )
+      .map((h) => HabitViewModel(
+            habit: h,
+            habitMarks: habitMarks
+                .where((hm) => hm.habitId == h.id)
+                .where((hm) => dateRelationDateRange.matchDatetime(hm.datetime))
+                .toList(),
+          ))
       .toList();
 }
 
@@ -192,9 +104,9 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
     if (event is HabitsLoadedEvent) {
       var habits = await habitRepo.listHabits();
       var habitMarks = await habitRepo.listHabitMarksBetween(
-        DayDateTimeRange(DateTime.now()
-                .add(DateRelationToDuration[DateRelation.twoDaysAgo]))
-            .fromDateTime,
+        DayDateTimeRange(
+          DateTime.now().add(DateRelationToDuration[DateRelation.twoDaysAgo]),
+        ).fromDateTime,
         DateTime.now(),
       );
 
