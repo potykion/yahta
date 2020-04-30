@@ -24,6 +24,7 @@ class HabitState {
       Map.fromEntries(OrderedDateRelations.map((dr) {
         CompletionStatus completionStatus;
 
+//        todo filter by date range
         if (habitViewModels.every((vm) => vm.completed)) {
           completionStatus = CompletionStatus.positive;
         } else if (habitViewModels.every((vm) => !vm.completed)) {

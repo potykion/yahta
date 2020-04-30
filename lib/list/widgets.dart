@@ -55,6 +55,18 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
     selectedIndex = DateRelationToSwiperIndex[widget.initialDateRelation];
   }
 
+  /// Swiper(
+  //              itemCount: 3,
+  //              itemBuilder: (context, index) {
+  //                return Stack(
+  //                  children: <Widget>[
+  //                    Positioned(child: Container(height: appBarHeight, color: Colors.red, width: MediaQuery.of(context).size.width,), top: 0),
+  //                    Positioned(child: CircleAvatar(radius: 10, backgroundColor: Colors.blue), top: appBarHeight - 10.0,),
+  //                  ],
+  //                );
+  //              },
+  //            )
+
   @override
   Widget build(BuildContext context) {
     return Swiper(
@@ -81,7 +93,8 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
             ),
           ),
           color: widget.dateRelationColors[dateRelation],
-//          height: 84 + context.statusBarHeight,
+          height: 120,
+          width: MediaQuery.of(context).size.width,
         );
 
         var bottom = -15.0;
@@ -91,7 +104,7 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
             child: StrokedCircle(
               innerColor: widget.dateRelationColors[previousDateRelation],
             ),
-            bottom: bottom,
+            top: 120.0 -15,
             left: -15,
           ));
         }
@@ -99,7 +112,7 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
           child: StrokedCircle(
             innerColor: widget.dateRelationColors[dateRelation],
           ),
-          bottom: bottom,
+          top: 120.0 -15,
           left: 30,
         ));
         if (nextDateRelation != null) {
@@ -107,7 +120,7 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
             child: StrokedCircle(
               innerColor: widget.dateRelationColors[nextDateRelation],
             ),
-            bottom: bottom,
+            top: 120.0 -15,
             right: -15,
           ));
         }
