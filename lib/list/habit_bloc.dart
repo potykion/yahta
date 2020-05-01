@@ -22,16 +22,15 @@ class HabitState {
 
   Map<DateRelation, CompletionStatus> get dateRelationCompletions =>
       Map.fromEntries(OrderedDateRelations.map((dr) {
-        CompletionStatus completionStatus;
+        var viewModels = filterHabitViewModelsByDateRange(
+          DayDateTimeRange(DateTime.now().add(DateRelationToDuration[dr])),
+        );
 
-//        todo filter by date range
-        if (habitViewModels.every((vm) => vm.completed)) {
-          completionStatus = CompletionStatus.positive;
-        } else if (habitViewModels.every((vm) => !vm.completed)) {
-          completionStatus = CompletionStatus.negative;
-        } else {
-          completionStatus = CompletionStatus.neutral;
-        }
+        var completionStatus = viewModels.every((vm) => vm.completed)
+            ? CompletionStatus.positive
+            : viewModels.every((vm) => !vm.completed)
+                ? CompletionStatus.negative
+                : CompletionStatus.neutral;
 
         return MapEntry(dr, completionStatus);
       }));
@@ -48,12 +47,25 @@ class HabitState {
   List<HabitViewModel> get habitViewModels => habits
       .map((h) => HabitViewModel(
             habit: h,
-            habitMarks: habitMarks
-                .where((hm) => hm.habitId == h.id)
-                .where((hm) => dateRelationDateRange.matchDatetime(hm.datetime))
-                .toList(),
+            habitMarks: habitMarks.where((hm) => hm.habitId == h.id).toList(),
           ))
       .toList();
+
+  List<HabitViewModel> get dateRelationHabitViewModels =>
+      filterHabitViewModelsByDateRange(dateRelationDateRange);
+
+  List<HabitViewModel> filterHabitViewModelsByDateRange(
+          DayDateTimeRange dateRange) =>
+      habitViewModels
+          .map(
+            (vm) => HabitViewModel(
+              habit: vm.habit,
+              habitMarks: vm.habitMarks
+                  .where((hm) => dateRange.matchDatetime(hm.datetime))
+                  .toList(),
+            ),
+          )
+          .toList();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

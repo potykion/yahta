@@ -60,8 +60,8 @@ class _YAHabitListPageState extends State<YAHabitListPage> {
   Widget buildListView() => BlocBuilder<HabitBloc, HabitState>(
         builder: (context, state) => ListView.builder(
           itemBuilder: (context, index) =>
-              HabitRow(state.habitViewModels[index]),
-          itemCount: state.habitViewModels.length,
+              HabitRow(state.dateRelationHabitViewModels[index]),
+          itemCount: state.dateRelationHabitViewModels.length,
         ),
       );
 }
