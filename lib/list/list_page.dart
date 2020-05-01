@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:yahta/list/habit_bloc.dart';
 import 'package:yahta/list/view_models.dart';
 import 'package:yahta/list/widgets.dart';
@@ -20,30 +19,38 @@ class _YAHabitListPageState extends State<YAHabitListPage> {
 
   @override
   Widget build(BuildContext context) {
-    var appBarHeight = 120.0;
-    var inputHeight = 60.0;
+    final appBarHeight = 120.0;
+    final inputHeight = 60.0;
     var listViewHeight = MediaQuery.of(context).size.height - appBarHeight - inputHeight;
 
     return Scaffold(
-        //        appBar:
-        //  fixme: pizdah
-        //    https://stackoverflow.com/questions/50215334/stack-on-working-as-expected-z-index-css-equivalent
         body: Stack(
           fit: StackFit.expand,
           overflow: Overflow.visible,
           children: <Widget>[
-          BlocBuilder<HabitBloc, HabitState>(
-            builder: (BuildContext context, HabitState state) =>
-              DateRelationAppBar(
-              dateRelationTitles: AppBarTitles,
-              dateRelationColors: state.appBarColors,
-              onDateRelationChange: (dr) => BlocProvider.of<HabitBloc>(context)
-                  .add(DateRelationChangedEvent(dr)),
-             ),
-          ),
-            Positioned(child: Container(child: buildListView(), height: listViewHeight, width: MediaQuery.of(context).size.width,), top: appBarHeight,),
+            Padding(
+              padding: const EdgeInsets.only(top: 120, bottom: 60),
+              child: Container(child: buildListView(), color: Colors.white,),
+            ),
 
-            Positioned(child: Container(child: AddHabitForm(), width: MediaQuery.of(context).size.width, height: inputHeight,), bottom: 0,),
+          Positioned(
+            child: Container(
+              child: BlocBuilder<HabitBloc, HabitState>(
+                builder: (BuildContext context, HabitState state) =>
+                  DateRelationAppBar(
+                  dateRelationTitles: AppBarTitles,
+                  dateRelationColors: state.appBarColors,
+                  onDateRelationChange: (dr) => BlocProvider.of<HabitBloc>(context)
+                      .add(DateRelationChangedEvent(dr)),
+                 ),
+              ),
+              height: appBarHeight + 20,
+              width: MediaQuery.of(context).size.width,
+            ),
+            top: 0,
+          ),
+
+            Positioned(child: Container(child: AddHabitForm(), width: MediaQuery.of(context).size.width, height: inputHeight, color: Colors.white,), bottom: 0,),
 
           ],
         ),
