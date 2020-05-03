@@ -21,42 +21,48 @@ class _YAHabitListPageState extends State<YAHabitListPage> {
   Widget build(BuildContext context) {
     final appBarHeight = 120.0;
     final inputHeight = 60.0;
-    var listViewHeight = MediaQuery.of(context).size.height - appBarHeight - inputHeight;
+    var listViewHeight =
+        MediaQuery.of(context).size.height - appBarHeight - inputHeight;
 
     return Scaffold(
-        body: Stack(
-          fit: StackFit.expand,
-          overflow: Overflow.visible,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 120, bottom: 60),
-              child: Container(child: buildListView(), color: Colors.white,),
-            ),
-
+      body: Stack(
+        fit: StackFit.expand,
+        overflow: Overflow.visible,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 120, bottom: 60),
+            child: Container(child: buildListView(), color: Colors.white),
+          ),
           Positioned(
             child: Container(
               child: BlocBuilder<HabitBloc, HabitState>(
                 builder: (BuildContext context, HabitState state) =>
-                  DateRelationAppBar(
+                    DateRelationAppBar(
                   dateRelationTitles: AppBarTitles,
                   dateRelationColors: state.appBarColors,
-                  onDateRelationChange: (dr) => BlocProvider.of<HabitBloc>(context)
-                      .add(DateRelationChangedEvent(dr)),
-                 ),
+                  onDateRelationChange: (dr) =>
+                      BlocProvider.of<HabitBloc>(context)
+                          .add(DateRelationChangedEvent(dr)),
+                ),
               ),
-              height: appBarHeight + 20,
+              height: appBarHeight + 15,
               width: MediaQuery.of(context).size.width,
             ),
             top: 0,
           ),
-
-            Positioned(child: Container(child: AddHabitForm(), width: MediaQuery.of(context).size.width, height: inputHeight, color: Colors.white,), bottom: 0,),
-
-          ],
-        ),
-      );
+          Positioned(
+            child: Container(
+              child: AddHabitForm(),
+              width: MediaQuery.of(context).size.width,
+              height: inputHeight,
+              color: Colors.white,
+            ),
+            bottom: 0,
+          ),
+        ],
+      ),
+    );
   }
-
 
   buildSizedAppBar(BuildContext context, Widget appBar, {size: 50}) =>
       PreferredSize(

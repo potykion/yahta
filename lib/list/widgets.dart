@@ -6,6 +6,70 @@ import 'package:yahta/logic/core/context_apis.dart';
 import 'habit_bloc.dart';
 import 'models.dart';
 
+class AppBarWithDots extends StatelessWidget {
+  final String title;
+  final Color appBarColor;
+  final Color leftDotColor;
+  final Color middleDotColor;
+  final Color rightDotColor;
+  final double appBarHeight = 120;
+  final double dotRadius = 15;
+
+  AppBarWithDots({
+    @required this.title,
+    @required this.appBarColor,
+    @required this.middleDotColor,
+    this.leftDotColor,
+    this.rightDotColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var appBar = Container(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+        child: Align(
+          child: Text(
+            this.title,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+          ),
+          alignment: Alignment(-1, 0.5),
+        ),
+      ),
+      color: this.appBarColor,
+      height: appBarHeight,
+      width: MediaQuery.of(context).size.width,
+    );
+
+    List<Widget> dots = [
+      leftDotColor != null
+          ? Positioned(
+              child: StrokedCircle(innerColor: leftDotColor),
+              top: appBarHeight - dotRadius,
+              left: -dotRadius,
+            )
+          : null,
+      Positioned(
+        child: StrokedCircle(innerColor: middleDotColor),
+        top: appBarHeight - dotRadius,
+        left: dotRadius * 2,
+      ),
+      rightDotColor != null
+          ? Positioned(
+              child: StrokedCircle(innerColor: rightDotColor),
+              top: appBarHeight - dotRadius,
+              right: -dotRadius,
+            )
+          : null
+    ].where((dot) => dot != null).toList();
+
+    return Stack(
+      overflow: Overflow.visible,
+      children: [appBar].cast<Widget>() + dots,
+    );
+  }
+}
+
 class StrokedCircle extends StatelessWidget {
   final Color innerColor;
   final Color outerColor;
@@ -55,18 +119,6 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
     selectedIndex = DateRelationToSwiperIndex[widget.initialDateRelation];
   }
 
-  /// Swiper(
-  //              itemCount: 3,
-  //              itemBuilder: (context, index) {
-  //                return Stack(
-  //                  children: <Widget>[
-  //                    Positioned(child: Container(height: appBarHeight, color: Colors.red, width: MediaQuery.of(context).size.width,), top: 0),
-  //                    Positioned(child: CircleAvatar(radius: 10, backgroundColor: Colors.blue), top: appBarHeight - 10.0,),
-  //                  ],
-  //                );
-  //              },
-  //            )
-
   @override
   Widget build(BuildContext context) {
     return Swiper(
@@ -76,66 +128,18 @@ class _DateRelationAppBarState extends State<DateRelationAppBar> {
         var dateRelation = SwiperIndexToDateRelation[index];
         var nextDateRelation = SwiperIndexToDateRelation[index + 1];
 
-        var appBar = Container(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-            child: Align(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    widget.dateRelationTitles[dateRelation].toUpperCase(),
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-              alignment: Alignment(0, 0.5),
-            ),
-          ),
-          color: widget.dateRelationColors[dateRelation],
-          height: 120,
-          width: MediaQuery.of(context).size.width,
-        );
-
-        var bottom = -15.0;
-        List<Widget> statusCircles = [];
-        if (previousDateRelation != null) {
-          statusCircles.add(Positioned(
-            child: StrokedCircle(
-              innerColor: widget.dateRelationColors[previousDateRelation],
-            ),
-            top: 120.0 -15,
-            left: -15,
-          ));
-        }
-        statusCircles.add(Positioned(
-          child: StrokedCircle(
-            innerColor: widget.dateRelationColors[dateRelation],
-          ),
-          top: 120.0 -15,
-          left: 30,
-        ));
-        if (nextDateRelation != null) {
-          statusCircles.add(Positioned(
-            child: StrokedCircle(
-              innerColor: widget.dateRelationColors[nextDateRelation],
-            ),
-            top: 120.0 -15,
-            right: -15,
-          ));
-        }
-
-        return Stack(
-          overflow: Overflow.visible,
-          children: [appBar].cast<Widget>() + statusCircles,
+        return AppBarWithDots(
+          title: widget.dateRelationTitles[dateRelation].toUpperCase(),
+          appBarColor: widget.dateRelationColors[dateRelation],
+          middleDotColor: widget.dateRelationColors[dateRelation],
+          leftDotColor: widget.dateRelationColors[previousDateRelation],
+          rightDotColor: widget.dateRelationColors[nextDateRelation],
         );
       },
       index: selectedIndex,
       loop: false,
       onIndexChanged: (index) {
-        setState(() {
-          selectedIndex = index;
-        });
+        setState(() => selectedIndex = index);
         widget.onDateRelationChange(SwiperIndexToDateRelation[index]);
       },
     );
@@ -149,40 +153,45 @@ class HabitRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 4, horizontal: 35),
-        child: Row(
-          children: <Widget>[
-            CircleAvatar(
-              backgroundColor: StatusToColorMap[viewModel.completionStatus],
-              radius: 10,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-              child: Text(
-                viewModel.title,
-                style: TextStyle(
-                  fontSize: 18,
-                  decoration:
-                      viewModel.completed ? TextDecoration.lineThrough : null,
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-      key: Key(viewModel.id.toString()),
-      confirmDismiss: (DismissDirection dismissDirection) async {
-        BlocProvider.of<HabitBloc>(context).add(viewModel.completed
-            ? HabitIncompletedEvent(viewModel.id)
-            : HabitCompletedEvent(viewModel.id));
-
-        return false;
+    return GestureDetector(
+      onTap: () {
+        print("tap");
       },
-      direction: viewModel.completed
-          ? DismissDirection.startToEnd
-          : DismissDirection.endToStart,
+      child: Dismissible(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 35),
+          child: Row(
+            children: <Widget>[
+              CircleAvatar(
+                backgroundColor: StatusToColorMap[viewModel.completionStatus],
+                radius: 10,
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                child: Text(
+                  viewModel.title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    decoration:
+                        viewModel.completed ? TextDecoration.lineThrough : null,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+        key: Key(viewModel.id.toString()),
+        confirmDismiss: (DismissDirection dismissDirection) async {
+          BlocProvider.of<HabitBloc>(context).add(viewModel.completed
+              ? HabitIncompletedEvent(viewModel.id)
+              : HabitCompletedEvent(viewModel.id));
+
+          return false;
+        },
+        direction: viewModel.completed
+            ? DismissDirection.startToEnd
+            : DismissDirection.endToStart,
+      ),
     );
   }
 }
@@ -225,10 +234,7 @@ class _AddHabitFormState extends State<AddHabitForm> {
               : null,
         ),
       ),
-      padding: EdgeInsets.symmetric(
-        vertical: 8,
-        horizontal: 16,
-      ),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
     );
   }
 }
