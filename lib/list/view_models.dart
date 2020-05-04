@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:yahta/logic/habit/db.dart';
 
 import 'models.dart';
@@ -35,3 +36,9 @@ class HabitViewModel {
   CompletionStatus get completionStatus =>
       completed ? CompletionStatus.positive : CompletionStatus.negative;
 }
+
+Map<CompletionStatus, Color> StatusToColorMap = {
+  CompletionStatus.positive: Color(0xff95E1D3),
+  CompletionStatus.neutral: Color(0xffFCE38A),
+  CompletionStatus.negative: Color(0xffF88181),
+};

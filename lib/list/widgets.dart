@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:yahta/list/view_models.dart';
 import 'package:yahta/logic/core/context_apis.dart';
+import 'edit_page.dart';
 import 'habit_bloc.dart';
 import 'models.dart';
 
@@ -18,10 +19,10 @@ class AppBarWithDots extends StatelessWidget {
   AppBarWithDots({
     @required this.title,
     @required this.appBarColor,
-    @required this.middleDotColor,
+    middleDotColor,
     this.leftDotColor,
     this.rightDotColor,
-  });
+  }) : this.middleDotColor = middleDotColor ?? appBarColor;
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +64,10 @@ class AppBarWithDots extends StatelessWidget {
           : null
     ].where((dot) => dot != null).toList();
 
-    return Stack(
-      overflow: Overflow.visible,
-      children: [appBar].cast<Widget>() + dots,
+    return Container(
+      child: Stack(children: [appBar].cast<Widget>() + dots),
+      height: appBarHeight + dotRadius,
+      color: Colors.white,
     );
   }
 }
@@ -154,8 +156,11 @@ class HabitRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        print("tap");
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => EditPage()),
+        );
       },
       child: Dismissible(
         child: Padding(
