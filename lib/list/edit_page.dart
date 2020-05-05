@@ -4,6 +4,10 @@ import 'package:yahta/list/view_models.dart';
 import 'package:yahta/list/widgets.dart';
 
 class EditPage extends StatefulWidget {
+  HabitViewModel viewModel;
+
+  EditPage(this.viewModel);
+
   @override
   _EditPageState createState() => _EditPageState();
 }
@@ -14,15 +18,26 @@ class _EditPageState extends State<EditPage> {
     return Scaffold(
       body: Column(
         children: <Widget>[
-          AppBarWithDots(
-            title: "Редактирование\nпривычки",
-            appBarColor: StatusToColorMap[CompletionStatus.positive],
+          Dismissible(
+            child: AppBarWithDots(
+              title: "Редактирование\nпривычки",
+              appBarColor: StatusToColorMap[CompletionStatus.positive],
+            ),
+            direction: DismissDirection.startToEnd,
+            confirmDismiss: (_) async {
+              Navigator.pop(context);
+              return false;
+            },
+            key: Key("app-bar"),
           ),
           Flexible(
             child: Container(
               child: Column(
                 children: <Widget>[
-                  TextFormField(),
+                  SubmittableInput(
+                    initialText: widget.viewModel.title,
+                    hint: "У привычки должно быть имя",
+                  ),
                   Spacer(),
                   Padding(
                     padding: const EdgeInsets.all(8.0),

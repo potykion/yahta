@@ -159,7 +159,7 @@ class HabitRow extends StatelessWidget {
       onTap: () async {
         await Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => EditPage()),
+          MaterialPageRoute(builder: (_) => EditPage(this.viewModel)),
         );
       },
       child: Dismissible(
@@ -214,11 +214,12 @@ typedef OnInput = void Function(String input);
 typedef OnSubmit = void Function(String input);
 
 class SubmittableInput extends StatefulWidget {
+  final String initialText;
   final String hint;
   final OnInput onInput;
   final OnSubmit onSubmit;
 
-  SubmittableInput({this.hint, this.onInput, this.onSubmit});
+  SubmittableInput({this.initialText, this.hint, this.onInput, this.onSubmit});
 
   @override
   _SubmittableInputState createState() => _SubmittableInputState();
@@ -232,6 +233,7 @@ class _SubmittableInputState extends State<SubmittableInput> {
   void initState() {
     super.initState();
 
+    controller.text = widget.initialText;
     controller.addListener(() {
       setState(() => inputText = controller.text);
       if (widget.onInput != null) widget.onInput(inputText);
