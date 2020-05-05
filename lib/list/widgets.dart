@@ -201,20 +201,41 @@ class HabitRow extends StatelessWidget {
   }
 }
 
-class AddHabitForm extends StatefulWidget {
+class AddHabitForm extends StatelessWidget {
   @override
-  _AddHabitFormState createState() => _AddHabitFormState();
+  Widget build(BuildContext context) => SubmittableInput(
+        hint: 'чем хочешь заниматься?',
+        onSubmit: (habitText) => BlocProvider.of<HabitBloc>(context)
+            .add(HabitCreatedEvent(habitText)),
+      );
 }
 
-class _AddHabitFormState extends State<AddHabitForm> {
-  String habitText = "";
+typedef OnInput = void Function(String input);
+typedef OnSubmit = void Function(String input);
+
+class SubmittableInput extends StatefulWidget {
+  final String hint;
+  final OnInput onInput;
+  final OnSubmit onSubmit;
+
+  SubmittableInput({this.hint, this.onInput, this.onSubmit});
+
+  @override
+  _SubmittableInputState createState() => _SubmittableInputState();
+}
+
+class _SubmittableInputState extends State<SubmittableInput> {
+  String inputText = "";
   TextEditingController controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    controller.addListener(() => setState(() => habitText = controller.text));
+    controller.addListener(() {
+      setState(() => inputText = controller.text);
+      if (widget.onInput != null) widget.onInput(inputText);
+    });
   }
 
   @override
@@ -225,13 +246,12 @@ class _AddHabitFormState extends State<AddHabitForm> {
         style: TextStyle(fontSize: 18),
         decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: 'чем хочешь заниматься?',
-          suffixIcon: habitText.isNotEmpty
+          hintText: widget.hint,
+          suffixIcon: widget.onSubmit != null && inputText.isNotEmpty
               ? IconButton(
                   onPressed: () {
-                    BlocProvider.of<HabitBloc>(context)
-                        .add(HabitCreatedEvent(habitText));
-                    controller.text = "";
+                    widget.onSubmit(inputText);
+                    WidgetsBinding.instance.addPostFrameCallback( (_) => controller.clear());
                     context.removeFocus();
                   },
                   icon: Icon(Icons.done),
