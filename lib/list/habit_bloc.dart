@@ -35,6 +35,8 @@ class HabitState {
         return MapEntry(dr, completionStatus);
       }));
 
+  Color get selectedDateRelationColor => StatusToColorMap[dateRelationCompletions[selectedDateRelation]];
+
   Map<DateRelation, Color> get appBarColors => dateRelationCompletions.map(
         (dr, completionStatus) =>
             MapEntry(dr, StatusToColorMap[completionStatus]),

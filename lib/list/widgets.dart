@@ -13,8 +13,8 @@ class AppBarWithDots extends StatelessWidget {
   final Color leftDotColor;
   final Color middleDotColor;
   final Color rightDotColor;
-  final double appBarHeight = 120;
-  final double dotRadius = 15;
+  static final  double appBarHeight = 120;
+  static final double dotRadius = 15;
 
   AppBarWithDots({
     @required this.title,
@@ -65,7 +65,10 @@ class AppBarWithDots extends StatelessWidget {
     ].where((dot) => dot != null).toList();
 
     return Container(
-      child: Stack(children: [appBar].cast<Widget>() + dots),
+      child: Stack(
+          children: [appBar].cast<Widget>() + dots,
+          overflow: Overflow.visible,
+      ),
       height: appBarHeight + dotRadius,
       color: Colors.white,
     );
@@ -164,7 +167,7 @@ class HabitRow extends StatelessWidget {
       },
       child: Dismissible(
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 35),
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 35),
           child: Row(
             children: <Widget>[
               CircleAvatar(
