@@ -13,12 +13,15 @@ class MyApp extends StatelessWidget {
         child: new MaterialApp(
           title: 'yahta',
           theme: ThemeData(
-            fontFamily: "Montserrat",
-            primaryColor: Color(0xff95E1D3),
-            textSelectionColor: Color(0xff95E1D3),
-            textSelectionHandleColor: Color(0xff95E1D3),
-            cursorColor: Color(0xff95E1D3)
-          ),
+              fontFamily: "Montserrat",
+              primaryColor: Color(0xff95E1D3),
+              textSelectionColor: Color(0xff95E1D3),
+              textSelectionHandleColor: Color(0xff95E1D3),
+              cursorColor: Color(0xff95E1D3),
+              pageTransitionsTheme: PageTransitionsTheme(builders: {
+                TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                TargetPlatform.android: CupertinoPageTransitionsBuilder()
+              })),
           home: YAHabitListPage(),
         ),
       );
