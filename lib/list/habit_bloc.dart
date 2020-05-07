@@ -35,7 +35,8 @@ class HabitState {
         return MapEntry(dr, completionStatus);
       }));
 
-  Color get selectedDateRelationColor => StatusToColorMap[dateRelationCompletions[selectedDateRelation]];
+  Color get selectedDateRelationColor =>
+      StatusToColorMap[dateRelationCompletions[selectedDateRelation]];
 
   Map<DateRelation, Color> get appBarColors => dateRelationCompletions.map(
         (dr, completionStatus) =>
@@ -100,6 +101,13 @@ class HabitCreatedEvent extends HabitEvent {
   String habitTitle;
 
   HabitCreatedEvent(this.habitTitle);
+}
+
+class HabitUpdatedEvent extends HabitEvent {
+  int id;
+  String title;
+
+  HabitUpdatedEvent(this.id, {this.title});
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,6 +177,21 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
       var habit = await habitRepo.getHabitById(habitId);
       yield HabitState(
         habits: state.habits..add(habit),
+        habitMarks: state.habitMarks,
+        selectedDateRelation: state.selectedDateRelation,
+      );
+    } else if (event is HabitUpdatedEvent) {
+      var habit = await habitRepo.getHabitById(event.id);
+      var updatedHabit = habit.copyWith(title: event.title);
+
+      await habitRepo.updateHabit(updatedHabit);
+
+      var newHabits =
+          state.habits.where((h) => h.id != updatedHabit.id).toList() +
+              [updatedHabit];
+
+      yield HabitState(
+        habits: newHabits,
         habitMarks: state.habitMarks,
         selectedDateRelation: state.selectedDateRelation,
       );

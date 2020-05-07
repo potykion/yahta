@@ -30,7 +30,7 @@ class _EditPageState extends State<EditPage> {
                 itemBuilder: (context, index) {
                   if (index == 1) {
                     return AppBarWithDots(
-                      title: "Редактирование\nпривычки",
+                      title: "Редактирование\nпривычки".toUpperCase(),
                       appBarColor: StatusToColorMap[CompletionStatus.positive],
                       leftDotColor: state.selectedDateRelationColor,
                     );
@@ -43,6 +43,8 @@ class _EditPageState extends State<EditPage> {
                       rightDotColor: state.selectedDateRelationColor,
                     );
                   }
+
+                  throw Exception("Invalid index: $index");
                 },
                 onIndexChanged: (_) => Navigator.pop(context),
               ),
@@ -56,6 +58,8 @@ class _EditPageState extends State<EditPage> {
                   SubmittableInput(
                     initialText: widget.viewModel.title,
                     hint: "У привычки должно быть имя",
+                    onInput: (title) => BlocProvider.of<HabitBloc>(context).add(
+                        HabitUpdatedEvent(widget.viewModel.id, title: title)),
                   ),
                   Spacer(),
                   Padding(
