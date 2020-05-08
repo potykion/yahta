@@ -74,7 +74,12 @@ class _EditPageState extends State<EditPage> {
                             style: TextStyle(fontSize: 18),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          BlocProvider.of<HabitBloc>(context).add(
+                              HabitUpdatedEvent(widget.viewModel.id,
+                                  stoppedDate: DateTime.now()));
+                          Navigator.pop(context);
+                        },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5)),
                         color: Colors.white,

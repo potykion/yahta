@@ -48,6 +48,7 @@ class HabitState {
       );
 
   List<HabitViewModel> get habitViewModels => habits
+      .where((h) => h.stoppedDate == null)
       .map((h) => HabitViewModel(
             habit: h,
             habitMarks: habitMarks.where((hm) => hm.habitId == h.id).toList(),
@@ -106,8 +107,9 @@ class HabitCreatedEvent extends HabitEvent {
 class HabitUpdatedEvent extends HabitEvent {
   int id;
   String title;
+  DateTime stoppedDate;
 
-  HabitUpdatedEvent(this.id, {this.title});
+  HabitUpdatedEvent(this.id, {this.title, this.stoppedDate});
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -182,7 +184,10 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
       );
     } else if (event is HabitUpdatedEvent) {
       var habit = await habitRepo.getHabitById(event.id);
-      var updatedHabit = habit.copyWith(title: event.title);
+      var updatedHabit = habit.copyWith(
+        title: event.title ?? habit.title,
+        stoppedDate: event.stoppedDate ?? habit.stoppedDate,
+      );
 
       await habitRepo.updateHabit(updatedHabit);
 
